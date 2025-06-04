@@ -4,55 +4,12 @@ header('Content-Type: application/json');
 // Función para validar los datos de entrada
 function validateInput($input) {
     $errors = [];
-    
-    // Verificar que existe la sección smtp
+    // Permitir guardar aunque todos los campos estén vacíos
     if (!isset($input['smtp']) || !is_array($input['smtp'])) {
         $errors[] = 'La configuración SMTP es inválida';
         return $errors;
     }
-    
-    $smtp = $input['smtp'];
-    
-    // Lista de campos requeridos
-    $requiredFields = [
-        'host' => 'El host SMTP',
-        'username' => 'El nombre de usuario',
-        'password' => 'La contraseña',
-        'port' => 'El puerto',
-        'from_email' => 'El email del remitente',
-        'from_name' => 'El nombre del remitente',
-        'secure' => 'El tipo de seguridad'
-    ];
-    
-    // Validar campos requeridos
-    foreach ($requiredFields as $field => $label) {
-        if (!isset($smtp[$field]) || (empty($smtp[$field]) && $smtp[$field] !== '0')) {
-            $errors[] = $label . ' es requerido';
-        } else if ($field === 'from_email' && !filter_var($smtp[$field], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'El email del remitente no tiene un formato válido';
-        }
-    }
-    
-    // Si hay campos vacíos, no seguir con el resto de validaciones
-    if (!empty($errors)) {
-        return $errors;
-    }
-    
-    // Validar host
-    if (!filter_var($smtp['host'], FILTER_VALIDATE_DOMAIN)) {
-        $errors[] = 'El host SMTP no es válido';
-    }
-    
-    // Validar puerto
-    if (!filter_var($smtp['port'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]])) {
-        $errors[] = 'El puerto debe ser un número entre 1 y 65535';
-    }
-    
-    // Validar secure
-    if (!in_array($smtp['secure'], ['ssl', 'tls'])) {
-        $errors[] = 'El tipo de seguridad debe ser ssl o tls';
-    }
-    
+    // No validar campos requeridos, solo estructura
     return $errors;
 }
 
@@ -71,6 +28,13 @@ function loadCurrentConfig() {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         error_log('Iniciando actualización de configuración');
+        
+        // Limpiar mensajes de la sesión relacionados con el envío de correos ANTES de procesar el formulario
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        unset($_SESSION['mensaje']);
+        unset($_SESSION['tipo']);
         
         // Verificar si podemos leer la entrada
         $rawInput = file_get_contents('php://input');
@@ -107,16 +71,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Actualizar solo la sección SMTP
         // Si from_email está vacío, usar username
-        $fromEmail = isset($input['smtp']['from_email']) && !empty($input['smtp']['from_email']) ? $input['smtp']['from_email'] : $input['smtp']['username'];
+        $fromEmail = $input['smtp']['from_email'] ?? '';
         $config = [
             'smtp' => [
-                'host' => htmlspecialchars($input['smtp']['host'], ENT_QUOTES, 'UTF-8'),
-                'username' => htmlspecialchars($input['smtp']['username'], ENT_QUOTES, 'UTF-8'),
-                'password' => $input['smtp']['password'],
-                'port' => intval($input['smtp']['port']),
-                'from_email' => htmlspecialchars($fromEmail, ENT_QUOTES, 'UTF-8'),
-                'from_name' => htmlspecialchars($input['smtp']['from_name'], ENT_QUOTES, 'UTF-8'),
-                'secure' => htmlspecialchars($input['smtp']['secure'], ENT_QUOTES, 'UTF-8')
+                'host' => isset($input['smtp']['host']) ? htmlspecialchars($input['smtp']['host'], ENT_QUOTES, 'UTF-8') : '',
+                'username' => isset($input['smtp']['username']) ? htmlspecialchars($input['smtp']['username'], ENT_QUOTES, 'UTF-8') : '',
+                'password' => $input['smtp']['password'] ?? '',
+                'port' => isset($input['smtp']['port']) ? intval($input['smtp']['port']) : '',
+                'from_email' => isset($input['smtp']['from_email']) ? htmlspecialchars($input['smtp']['from_email'], ENT_QUOTES, 'UTF-8') : '',
+                'from_name' => isset($input['smtp']['from_name']) ? htmlspecialchars($input['smtp']['from_name'], ENT_QUOTES, 'UTF-8') : '',
+                'secure' => isset($input['smtp']['secure']) ? htmlspecialchars($input['smtp']['secure'], ENT_QUOTES, 'UTF-8') : ''
             ]
         ];
         

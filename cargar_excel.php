@@ -31,25 +31,25 @@ try {
     $spreadsheet = IOFactory::load($file['tmp_name']);
     $worksheet = $spreadsheet->getActiveSheet();
     
-    // Verificar la estructura del archivo
+    // Verificar la estructura del archivo (insensible a mayúsculas/minúsculas)
     $requiredHeaders = [
         'A1' => 'Código',
         'B1' => 'Nombre',
         'L1' => 'Email',
-        'M1' => 'Fecha Alta'
+        'N1' => 'Fecha Alta'
     ];
 
     foreach ($requiredHeaders as $cell => $expectedValue) {
         $actualValue = $worksheet->getCell($cell)->getValue();
-        if ($actualValue !== $expectedValue) {
-            throw new Exception("El archivo no tiene el formato correcto. Se esperaba '$expectedValue' en $cell");
+        if (mb_strtolower(trim($actualValue)) !== mb_strtolower($expectedValue)) {
+            throw new Exception("El archivo no tiene el formato correcto. Se esperaba '$expectedValue' en $cell, pero se encontró '" . $actualValue . "'.");
         }
     }
 
     // Copiar el archivo a la ubicación final
     $targetPath = __DIR__ . '/empresas_' . date('d-m-Y') . '.xlsx';
     if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-        throw new Exception('No se pudo guardar el archivo');
+        throw new Exception('No se pudo guardar el archivo en el servidor. Verifique permisos de escritura.');
     }
 
     // Establecer permisos de archivo

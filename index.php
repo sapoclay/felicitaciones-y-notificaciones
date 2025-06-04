@@ -6,7 +6,7 @@ function loadConfig() {
     if (file_exists($configFile)) {
         $config = json_decode(file_get_contents($configFile), true);
         if (json_last_error() === JSON_ERROR_NONE) {
-            return $config;
+        return $config;
         }
     }
     return ['smtp' => []];
@@ -37,7 +37,7 @@ function obtenerCorreosPorFecha() {
     $mesActual = date('m');
     
     for ($row = 2; $row <= $highestRow; ++$row) {
-        $fechaCell = $worksheet->getCell('M' . $row)->getValue();
+        $fechaCell = $worksheet->getCell('N' . $row)->getValue(); // Cambiado de M a N
         $partesFecha = explode('-', $fechaCell);
         if (count($partesFecha) === 3) {
             $timestamp = strtotime($partesFecha[0] . '-' . $partesFecha[1] . '-' . $partesFecha[2]);
@@ -129,10 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $mail = new PHPMailer(true);
             
-            $mail->SMTPDebug = 2; // Activar debug
-            $mail->Debugoutput = function($str, $level) {
-                error_log("SMTP DEBUG: $str");
-            };
+            $mail->SMTPDebug = 0; // Solo errores, sin mensajes de depuración
             
             $mail->isSMTP();
             $mail->Host = $config['smtp']['host'];
@@ -236,8 +233,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-// Obtener mensaje de la sesión si existe
-if (isset($_SESSION['mensaje'])) {
+// Obtener mensaje de la sesión si existe SOLO si la petición NO es POST (es decir, tras recargar no mostrar)
+$mensaje = '';
+$tipo_mensaje = '';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['mensaje'])) {
     $mensaje = $_SESSION['mensaje'];
     $tipo_mensaje = $_SESSION['tipo'];
     unset($_SESSION['mensaje']);
@@ -272,37 +271,37 @@ if (isset($_SESSION['mensaje'])) {
                         <li><strong>Código</strong> (columna A)</li>
                         <li><strong>Nombre</strong> (columna B)</li>
                         <li><strong>Email</strong> (columna L)</li>
-                        <li><strong>Fecha Alta</strong> (columna M)</li>
+                        <li><strong>Fecha Alta</strong> (columna N)</li>
                     </ul>
                 </small>
             </div>
             <h3>Configuración SMTP</h3>
             <div class="form-group">
                 <label for="host">Servidor SMTP:</label>
-                <input type="text" id="host" name="host" value="<?php echo htmlspecialchars($config['smtp']['host'] ?? ''); ?>" required>
+                <input type="text" id="host" name="host" value="<?php echo htmlspecialchars($config['smtp']['host'] ?? ''); ?>">
             </div>
             <div class="form-group">
                 <label for="username">Usuario SMTP:</label>
-                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($config['smtp']['username'] ?? ''); ?>" required>
+                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($config['smtp']['username'] ?? ''); ?>">
             </div>
             <div class="form-group">
                 <label for="from_email">Email del remitente:</label>
-                <input type="email" id="from_email" name="from_email" value="<?php echo htmlspecialchars($config['smtp']['from_email'] ?? ''); ?>" required>
+                <input type="email" id="from_email" name="from_email" value="<?php echo htmlspecialchars($config['smtp']['from_email'] ?? ''); ?>">
             </div>
             <div class="form-group">
                 <label for="password">Contraseña:</label>
                 <div class="password-container">
-                    <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($config['smtp']['password'] ?? ''); ?>" required>
+                    <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($config['smtp']['password'] ?? ''); ?>">
                     <button type="button" class="toggle-password" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
             <div class="form-group">
-                <label for="port">Puerto:</label>
-                <input type="number" id="port" name="port" value="<?php echo htmlspecialchars($config['smtp']['port'] ?? '465'); ?>" required>
+                <label for="from_name">Nombre del remitente:</label>
+                <input type="text" id="from_name" name="from_name" value="<?php echo htmlspecialchars($config['smtp']['from_name'] ?? ''); ?>">
             </div>
             <div class="form-group">
-                <label for="from_name">Nombre del remitente:</label>
-                <input type="text" id="from_name" name="from_name" value="<?php echo htmlspecialchars($config['smtp']['from_name'] ?? ''); ?>" required>
+                <label for="port">Puerto:</label>
+                <input type="number" id="port" name="port" value="<?php echo htmlspecialchars($config['smtp']['port'] ?? '465'); ?>" required>
             </div>
             <div class="form-group">
                 <label for="secure">Seguridad:</label>
@@ -343,10 +342,10 @@ if (isset($_SESSION['mensaje'])) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        mostrarNotificacion('Datos cargados correctamente', 'exito');
+                        mostrarNotificacion('Datos cargados correctamente. El archivo usado es empresas_' + new Date().toLocaleDateString('es-ES').replace(/\//g, '-') + '.xlsx', 'exito');
                         setTimeout(() => {
                             window.location.reload();
-                        }, 1000);
+                        }, 1500);
                     } else {
                         mostrarNotificacion('Error al cargar el archivo: ' + data.message, 'error');
                     }
@@ -436,8 +435,11 @@ if (isset($_SESSION['mensaje'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Cerrar el menú lateral y backdrop inmediatamente
+                    document.getElementById('sidebar').classList.remove('active');
+                    document.getElementById('sidebarBackdrop').classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
                     mostrarNotificacion('Configuración actualizada correctamente', 'exito');
-                    // Recargar la página después de 1 segundo
                     setTimeout(() => {
                         window.location.reload();
                     }, 1000);
@@ -470,7 +472,10 @@ if (isset($_SESSION['mensaje'])) {
     <?php endif; ?>
 
     <?php if (empty($correos)): ?>
-        <p>No hay clientes registrados el día <?php echo date('d'); ?> del mes <?php echo date('m'); ?> en ningún año.</p>
+        <div class="no-clients-message">
+            <i class="message-icon">📂</i>
+            <p>No hay clientes con fecha de alta <?php echo date('d/m/Y'); ?></p>
+        </div>
     <?php else: ?>
         <form method="POST" enctype="multipart/form-data" id="emailForm">
             <div class="form-group">
@@ -657,8 +662,8 @@ if (isset($_SESSION['mensaje'])) {
                     },
                     body: formData
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                     if (data.error) {
                         mostrarNotificacion(data.error, 'error');
                         progressContainer.style.display = 'none';
@@ -711,10 +716,12 @@ if (isset($_SESSION['mensaje'])) {
 
                 selectAllBtn.addEventListener('click', function() {
                     allSelected = !allSelected;
-                    const options = selectElement.options;
-                    for (let i = 0; i < options.length; i++) {
-                        options[i].selected = allSelected;
+                    for (let i = 0; i < selectElement.options.length; i++) {
+                        selectElement.options[i].selected = allSelected;
                     }
+                    // Forzar el repaint visual y el foco
+                    selectElement.focus();
+                    selectElement.blur();
                     selectAllBtn.textContent = allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos';
                 });
             });

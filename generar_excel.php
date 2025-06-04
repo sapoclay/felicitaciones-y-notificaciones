@@ -8,13 +8,26 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // Cargar configuración
 function loadConfig() {
     $configFile = __DIR__ . '/config.json';
+    $defaultConfig = [
+        'excel' => [
+            'path' => __DIR__,
+            'filename' => 'empresas_{date}.xlsx'
+        ]
+    ];
+
     if (file_exists($configFile)) {
         $config = json_decode(file_get_contents($configFile), true);
         if (json_last_error() === JSON_ERROR_NONE) {
+            // Fusionar con los valores predeterminados
+            if (!isset($config['excel'])) {
+                $config['excel'] = $defaultConfig['excel'];
+            } else {
+                $config['excel'] = array_merge($defaultConfig['excel'], $config['excel']);
+            }
             return $config;
         }
     }
-    return ['excel' => ['path' => __DIR__, 'filename' => 'empresas_{date}.xlsx']];
+    return $defaultConfig;
 }
 
 $config = loadConfig();
@@ -38,7 +51,8 @@ $headers = [
     'J1' => 'Teléfono',
     'K1' => 'Fax',
     'L1' => 'Email',
-    'M1' => 'Fecha Alta'
+    'M1' => 'Contacto',
+    'N1' => 'Fecha Alta'
 ];
 
 // Aplicar encabezados y estilo
@@ -50,28 +64,28 @@ foreach ($headers as $cell => $header) {
 // Datos de ejemplo
 $data = [
     [
-        'EMP001', 'Perez Lolailo Manolo', 'TecnoChunda', 'Calle Más Mayor 123', 'B12345678',
-        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'gron93394@mail.com', '03-06-2024'
+        'EMP001', 'Pruebando Ando María José', 'TecnoChunda', 'Calle Más Mayor 123', 'B12345678',
+        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'siyofueramuyrico@gmail.com', '684551555','04-06-2024'
     ],
     [
         'EMP002', 'Trocipurcio Rostinguelrs Mario Jacinto', 'DistRápida', 'Arvenida Primogénica 45', 'A87654321',
-        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', 'txupamelon29393@mail.com', '03-06-1980'
+        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', 'siyofuerarico@msn.com','684551555', '04-06-1980'
     ],
     [
         'EMP003', 'Chanchurcio Grande María Antonia', 'SPermaT', 'Plaza del Sol Ecillo 7', 'X1234567Y',
-        'Valencia', 'Valencia', '46001', 'España', '963789012', '963789013', 'info@andromenaguer.es', '03-06-1980'
+        'Valencia', 'Valencia', '46001', 'España', '963789012', '963789013', 'info@andromenaguer.es', '684551555', '04-06-1980'
     ],
     [
         'EMP004', 'Construcciones Martínez e Hijos', 'Pintamelón', 'Calle Juela 234', 'B98765432',
-        'Sevilla', 'Sevilla', '41001', 'España', '954567890', '954567891', 'info@colifrondio.es', '03-06-1980'
+        'Sevilla', 'Sevilla', '41001', 'España', '954567890', '954567891', 'info@colifrondio.es', '684551555', '03-06-1980'
     ],
     [
         'EMP005', 'Suministros Médicos López S.L.', 'MedioLópez', 'Avenida de la poca Salud 69', 'B45678901',
-        'Bilbao', 'Vizcaya', '48001', 'España', '944789123', '944789124', 'contarto@massachupets.es', '03-06-1980'
+        'Bilbao', 'Vizcaya', '48001', 'España', '944789123', '944789124', 'contarto@massachupets.es', '684551555', '03-06-1980'
     ],
     [
         'EMP006', 'Franchuncio Wend Benancio', 'MedioChancho', 'Avenida Zinganillo 345', 'F8754321',
-        'Wisconsyn', 'Alpedrete', '08074', 'España', '933456789', '937777780', 'tikitoke393941@mail.com', '03-06-1970'
+        'Wisconsyn', 'Alpedrete', '08074', 'España', '933456789', '937777780', 'tikitoke393941@mail.com', '684551555', '03-06-1970'
     ],
     
 ];
@@ -88,7 +102,7 @@ foreach ($data as $rowData) {
 }
 
 // Autoajustar anchos de columna
-foreach (range('A', 'M') as $col) {
+foreach (range('A', 'N') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
@@ -101,12 +115,18 @@ $fullPath = rtrim($excelConfig['path'], '/') . '/' . $filename;
 
 // Intentar guardar el archivo
 try {
-    if (!is_dir($excelConfig['path'])) {
-        throw new Exception("El directorio {$excelConfig['path']} no existe");
+    // Verificar y crear el directorio si es necesario
+    if (!file_exists($excelConfig['path'])) {
+        if (!@mkdir($excelConfig['path'], 0777, true)) {
+            throw new Exception("No se pudo crear el directorio {$excelConfig['path']}");
+        }
     }
     
+    // Asegurarse de que tenemos permisos de escritura
     if (!is_writable($excelConfig['path'])) {
-        throw new Exception("No hay permisos de escritura en {$excelConfig['path']}");
+        if (!@chmod($excelConfig['path'], 0777)) {
+            throw new Exception("No hay permisos de escritura en {$excelConfig['path']}");
+        }
     }
     
     $writer->save($fullPath);

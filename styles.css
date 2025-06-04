@@ -689,3 +689,31 @@ body.sidebar-open {
     color: var(--primary-color);
     font-weight: 600;
 }
+
+/* Mensaje de no hay clientes */
+.no-clients-message {
+    text-align: center;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    animation: fadeIn 0.5s ease-in;
+
+}
+
+.no-clients-message .message-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.no-clients-message p {
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: 300;
+    color: #6A2626;
+    margin-bottom: 2rem;
+}
