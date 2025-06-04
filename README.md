@@ -2,6 +2,8 @@
 
 Este sistema permite enviar correos electrónicos de felicitación y promociones a clientes en su fecha de alta. El sistema lee los datos desde un archivo Excel y permite enviar correos personalizados con imágenes adjuntas.
 
+![envio-felicitaciones](https://github.com/user-attachments/assets/6da68474-5d6c-4e1f-a523-c5aebe4fc839)
+
 > **Nota:** el archivo generar_excel solo ha sido creado para crear un archivo xlsx de ejemplo. De forma automática los > datos se tomarán del archivo empresas_[dd-mm-YYYY].xlsx que debe situarse en el directorio del proyecto. También se   > puede seleccionar desde el selector de la configuración del programa dentro de la interfaz.
 > Desde el directorio de la aplicación con: php generar_excel.php debería ejecutarse correctamente el archivo y generar > el .xlsx de forma automática.
 
@@ -50,6 +52,8 @@ chmod 666 /ruta/al/proyecto/config.json
 - `empresas_[fecha].xlsx` - Archivo Excel con los datos de los clientes
 
 ## Configuración
+
+![envio-felicitaciones-configuracion](https://github.com/user-attachments/assets/c082f248-d704-44e5-9baa-400535d0fb30)
 
 ### Configuración del servidor SMTP
 La configuración SMTP se gestiona a través de una interfaz gráfica en el panel lateral de la aplicación. Los parámetros configurables son:
