@@ -1,25 +1,27 @@
-# 📧 Sistema de Envío de Correos Masivos
+# 📧 Sistema de envío de correos masivos
 
 Sistema profesional para envío masivo de correos electrónicos con imágenes HTML incrustadas, desarrollado en PHP con arquitectura MVC.
 
-## 🎯 Características Principales
+## 🎯 Características principales
 
-### ✨ Funcionalidades Base
+### ✨ Funcionalidades base
 - **Editor WYSIWYG avanzado**: Editor visual TinyMCE con formato de texto e inserción de imágenes
 - **Carga automática de Excel**: Procesa archivos con formato `empresas_DD-MM-YYYY.xlsx`
 - **SMTP múltiple**: Compatible con Gmail, Outlook y servidores personalizados
 - **Progreso en tiempo real**: Seguimiento AJAX del proceso de envío
 - **Filtros por tratamiento**: Segmentación de envíos por tipos de servicio
 
-### 🚀 Mejoras Implementadas (Junio 2025)
+### 🚀 Mejoras implementadas (Junio 2025)
 - **✅ Alineación perfecta de imágenes**: Las imágenes del editor respetan la alineación configurada usando tablas HTML para máxima compatibilidad con todos los clientes de correo electrónico
 - **✅ Imágenes embebidas sin duplicados**: Eliminación de adjuntos tradicionales redundantes, manteniendo solo imágenes embebidas con CID únicos
 - **✅ Enlaces clickeables funcionales**: Las imágenes adjuntas incluyen enlaces completamente funcionales y clickeables
 - **✅ Prevención de reenvíos (PRG)**: Implementación del patrón Post-Redirect-Get para evitar el reenvío accidental de formularios al recargar la página
-- **✅ Corrección PHP 8+**: Resolución completa de advertencias de deprecación relacionadas con valores nulos en expresiones regulares
+- **✅ Corrección PHP 8+**: Resolución de advertencias de deprecación relacionadas con valores nulos en expresiones regulares
 - **🆕 Restricciones de tamaño optimizadas**: Límite máximo de 2MB por imagen para compatibilidad con servidores en la nube, con validaciones tanto en cliente como servidor
 - **🆕 Sistema unificado de imágenes**: Las imágenes del editor ahora se comportan exactamente igual que las adjuntas (embebidas con CID), manteniendo la alineación configurada
 - **✅ Corrección crítica completada**: Resuelto completamente el problema de contenido perdido cuando el mensaje contenía imágenes del editor. La nueva implementación con sistema de placeholders únicos garantiza la conservación total del contenido (ver `CORRECCION_CUERPO_VACIO.md`)
+- **✅ Redimensionado fiel de imágenes**: Las imágenes del editor mantienen el tamaño (width/height) definido por el usuario en el email final, además de la alineación
+- **🪲 Bugfix**: Corregido un error donde el redimensionado se perdía si la imagen tenía alineación personalizada (right/left/center)
 
 ## 🛠️ Tecnologías
 
@@ -76,6 +78,7 @@ Si usas windows, composer se debe [descargar desde su página web](https://getco
 ```bash
 php utils/generar_excel.php
 ```
+Si es que no tienes el archivo excel sobre el que trabajar
 
 3. **Configurar SMTP** - Configuración del archivo `config.json`. Esto se puede configurar desde la interfaz del programa:
 ```json
@@ -111,6 +114,7 @@ php utils/generar_excel.php
 - **🆕 Restricciones de tamaño**: Máximo 2MB por imagen para compatibilidad con servidores en la nube
 - **🆕 Validación dual**: Control de tamaño tanto en JavaScript (cliente) como PHP (servidor)
 - **🆕 Sistema unificado**: Las imágenes del editor se procesan como adjuntos embebidos igual que las tradicionales, preservando la alineación
+- **🆕 Redimensionado fiel**: El tamaño de la imagen (ancho/alto) definido en el editor se respeta en el email final, incluso si la imagen está alineada a la derecha o izquierda
 
 ### Limitaciones de Tamaño
 El sistema ahora incluye restricciones de 2MB por imagen para garantizar compatibilidad con servicios de hosting en la nube:
@@ -120,7 +124,7 @@ El sistema ahora incluye restricciones de 2MB por imagen para garantizar compati
 
 ## 🔧 Configuración SMTP
 
-**Gmail** (requiere contraseña de aplicación):
+**Gmail** (requiere contraseña de aplicación. Hay que habilitar en la configuración de la cuenta de Gmail que se pueda utilizar esa cuenta con cuentas de terceros o no seguras ....o algo así):
 ```json
 {"host": "smtp.gmail.com", "port": 587, "secure": "tls"}
 ```
