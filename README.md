@@ -150,4 +150,4 @@ Si actualizas desde una versión anterior que dependía de configuraciones PHP m
 
 ## ✨ Desarrolladores ✨ 
 
-**Javier** - Backend (modelo) | **Michel** - Frontend (vista) | **[entreunosyceros](https://entreunosyceros.net)** - Arquitectura y desarrollo (controlador)
+**Javier** - Backend (modelo) | **Michel** - Frontend (vista) | **[entreunosyceros](https://entreunosyceros.net)** - Arquitectura y desarrollo (modelo, vista, controlador)
