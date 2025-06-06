@@ -48,7 +48,7 @@ function obtenerCorreosPorFecha() {
         });
         
         $inputFileName = $files[0];
-        error_log("Usando archivo Excel: " . basename($inputFileName));
+        // error_log("Usando archivo Excel: " . basename($inputFileName));
     }
 
     $spreadsheet = IOFactory::load($inputFileName);
@@ -335,14 +335,22 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
             if (preg_match('/style=("[^"]*"|\'[^\']*\')/i', $imagenCompleta, $styleMatch)) {
                 $styleValue = trim($styleMatch[1], '"\'');
                 
-                // Extraer width del style
-                if (preg_match('/width:\s*([^;]+)/i', $styleValue, $widthMatch) && $width === null) {
+                // Extraer width del style (incluyendo max-width que usa el editor)
+                if (preg_match('/(?:max-)?width:\s*([^;]+)/i', $styleValue, $widthMatch) && $width === null) {
                     $width = trim($widthMatch[1]);
+                    // Convertir max-width a width para el email
+                    if (strpos($widthMatch[0], 'max-width') !== false) {
+                        $width = trim($widthMatch[1]);
+                    }
                 }
                 
-                // Extraer height del style
-                if (preg_match('/height:\s*([^;]+)/i', $styleValue, $heightMatch) && $height === null) {
+                // Extraer height del style (incluyendo max-height)
+                if (preg_match('/(?:max-)?height:\s*([^;]+)/i', $styleValue, $heightMatch) && $height === null) {
                     $height = trim($heightMatch[1]);
+                    // Convertir max-height a height para el email
+                    if (strpos($heightMatch[0], 'max-height') !== false) {
+                        $height = trim($heightMatch[1]);
+                    }
                 }
             }
             // Decodificar la imagen base64
@@ -357,7 +365,7 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
             
             if ($tamañoBytes > $maxSizeBytes) {
                 $sizeMB = round($tamañoBytes / (1024 * 1024), 2);
-                error_log("Imagen base64 demasiado grande: {$sizeMB}MB (máximo 2MB)");
+                error_log("Imagen base64 demasiado grande: {$sizeMB}MB (máximo 2MB)"); // Mantener este log porque es un error
                 continue; // Saltar esta imagen pero continuar con el procesamiento
             }
             
@@ -385,6 +393,10 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
                 // Detectar alineación del contexto alrededor de la imagen
                 $alineacion = detectarAlineacionImagen($mensajeLimpio, $match[0][1]);
                 
+                // DEBUG: Log del width y height detectados
+                // error_log("DEBUG: Imagen #$numeroImagen - width: " . var_export($width, true) . ", height: " . var_export($height, true));
+                // error_log("DEBUG: Atributos originales: " . $atributosImg);
+                
                 // Agregar a la lista de imágenes extraídas con información completa
                 $imagenesExtraidas[] = [
                     'tmp_name' => $archivoTemporal,
@@ -401,12 +413,36 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
                 // Crear placeholder único que será reemplazado después
                 $placeholder = '<!-- IMAGEN_PLACEHOLDER_' . $numeroImagen . '_' . uniqid() . ' -->';
                 $imgTag = '<img src="cid:' . $cid . '"' . $atributosImg . '>';
+                // Forzar el tamaño SOLO si el usuario lo definió explícitamente
+                if (($width !== null && $width !== '') || ($height !== null && $height !== '')) {
+                    // Eliminar cualquier style y atributos de tamaño anteriores
+                    $atributosImg = preg_replace('/\s*style=(\"[^\"]*\"|\'[^\']*\')/i', '', $atributosImg);
+                    $atributosImg = preg_replace('/\s*width=(\"[^\"]*\"|\'[^\']*\'|\S+)/i', '', $atributosImg);
+                    $atributosImg = preg_replace('/\s*height=(\"[^\"]*\"|\'[^\']*\'|\S+)/i', '', $atributosImg);
+                    // Usar width y height directos (no max-width) para forzar el tamaño
+                    $styleFinal = 'display:block;';
+                    if ($width !== null && $width !== '') {
+                        $widthValue = is_numeric($width) ? $width . 'px' : $width;
+                        $atributosImg .= ' width="' . $width . '"';
+                        $styleFinal .= 'width:' . $widthValue . ';';
+                    }
+                    if ($height !== null && $height !== '') {
+                        $heightValue = is_numeric($height) ? $height . 'px' : $height;
+                        $atributosImg .= ' height="' . $height . '"';
+                        $styleFinal .= 'height:' . $heightValue . ';';
+                    }
+                    $atributosImg .= ' style="' . $styleFinal . '"';
+                }
+                // Generar el tag <img ...> usando los atributos finales
+                $imgTag = '<img src="cid:' . $cid . '"' . $atributosImg . '>';
+                // error_log("DEBUG: IMG tag final: " . $imgTag);
+                // error_log("DEBUG: Alineación aplicada: " . $alineacion);
                 if ($alineacion === 'center') {
-                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">' . $imgTag . '</td></tr></table>';
+                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="text-align:center;">' . $imgTag . '</td></tr></table>';
                 } elseif ($alineacion === 'right') {
-                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="right">' . $imgTag . '</td></tr></table>';
+                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="right" style="text-align:right;">' . $imgTag . '</td></tr></table>';
                 } elseif ($alineacion === 'left') {
-                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="left">' . $imgTag . '</td></tr></table>';
+                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="left" style="text-align:left;">' . $imgTag . '</td></tr></table>';
                 } else {
                     $imgConCid = $imgTag;
                 }
@@ -444,26 +480,45 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
  */
 function detectarAlineacionImagen($html, $posicionImagen) {
     // Buscar hacia atrás desde la posición de la imagen para encontrar contenedores con alineación
-    $fragmentoAnterior = substr($html, 0, $posicionImagen + 200); // Un poco más para capturar el contexto
+    $fragmentoAnterior = substr($html, 0, $posicionImagen + 500); // Ampliado para capturar más contexto
     
-    // Buscar el contenedor más cercano con alineación
-    $patronesAlineacion = [
-        '/text-align:\s*(left|center|right|justify)/i',
-        '/align="(left|center|right|justify)"/i',
-        '/<(?:div|table|td)[^>]*(?:text-align|align)[^>]*(?:left|center|right|justify)[^>]*>/i'
-    ];
+    // error_log("DEBUG: Analizando fragmento para alineación - longitud: " . strlen($fragmentoAnterior));
     
-    // Buscar desde la posición hacia atrás
-    foreach ($patronesAlineacion as $patron) {
-        if (preg_match_all($patron, $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
-            // Tomar la coincidencia más cercana a la imagen
-            $ultimaCoincidencia = end($matches[1]);
-            if ($ultimaCoincidencia) {
-                return strtolower(trim($ultimaCoincidencia[0]));
-            }
+    // 1. Buscar primero en estilos CSS text-align
+    if (preg_match_all('/text-align:\s*(left|center|right|justify)/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
+        // Tomar la coincidencia más cercana a la imagen (la última)
+        $ultimaCoincidencia = end($matches[1]);
+        if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
+            $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
+            // error_log("DEBUG: Alineación detectada en CSS: " . $alineacionDetectada);
+            return $alineacionDetectada;
         }
     }
     
+    // 2. Buscar en atributos align
+    if (preg_match_all('/align="(left|center|right|justify)"/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
+        $ultimaCoincidencia = end($matches[1]);
+        if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
+            $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
+            // error_log("DEBUG: Alineación detectada en atributo align: " . $alineacionDetectada);
+            return $alineacionDetectada;
+        }
+    }
+    
+    // 3. Buscar específicamente en elementos contenedores como <div> y <p>
+    if (preg_match_all('/<(?:div|p)[^>]*style="[^"]*text-align:\s*(left|center|right|justify)[^"]*"/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
+        // El grupo de captura correcto es el primero (índice 1)
+        if (isset($matches[1]) && !empty($matches[1])) {
+            $ultimaCoincidencia = end($matches[1]);
+            if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
+                $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
+                // error_log("DEBUG: Alineación detectada en elemento contenedor: " . $alineacionDetectada);
+                return $alineacionDetectada;
+            }
+        }
+    }
+
+    // error_log("DEBUG: No se detectó alineación, usando 'center' por defecto");
     return 'center'; // Por defecto
 }
 
@@ -530,57 +585,9 @@ function limpiarHTMLEditor($html) {
         // 1. Remover los controles de imagen de nuestro editor personalizado
         $html = preg_replace('/<div[^>]*class="[^"]*image-controls[^"]*"[^>]*>.*?<\/div>/is', '', $html);
         
-        // 2. Extraer solo la imagen del contenedor, respetando alineación para clientes de correo
-        if ($html !== null && trim($html) !== '') {
-            $html = preg_replace_callback(
-                '/<div[^>]*class="[^"]*image-container[^"]*"[^>]*>(.*?)<\/div>/is', 
-                function($matches) {
-                    if (!isset($matches[0]) || !isset($matches[1])) {
-                        return '';
-                    }
-                    
-                    $contenidoCompleto = $matches[0];
-                    $contenido = $matches[1];
-                    
-                    // Verificar que el contenido no sea null
-                    if ($contenido === null) {
-                        return '';
-                    }
-                    
-                    // Extraer información de alineación del contenedor
-                    $alineacion = '';
-                    if (preg_match('/text-align:\s*(left|center|right|justify)/i', $contenidoCompleto, $alignMatch)) {
-                        $alineacion = strtolower(trim($alignMatch[1]));
-                    }
-                    
-                    // Extraer solo la etiqueta img
-                    if (preg_match('/<img[^>]*>/i', $contenido, $imgMatch)) {
-                        $img = $imgMatch[0];
-                        
-                        // Limpiar atributos del editor pero preservando width y height
-                        $img = preg_replace('/\s+(?:onclick|ondblclick|onload|onmouseover|onmouseout)="[^"]*"/i', '', $img);
-                        $img = preg_replace('/\s+(?:id|title)="[^"]*"/i', '', $img);
-                        
-                        // Aplicar alineación compatible con clientes de correo
-                        if ($alineacion) {
-                            if ($alineacion === 'center') {
-                                return '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">' . $img . '</td></tr></table>';
-                            } elseif ($alineacion === 'right') {
-                                return '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="right">' . $img . '</td></tr></table>';
-                            } else {
-                                return '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="left">' . $img . '</td></tr></table>';
-                            }
-                        }
-                        
-                        return $img;
-                    }
-                    return '';
-                }, 
-                $html
-            );
-        }
-        
-        // 3. Limpiar atributos de eventos en imágenes
+        // 2. NO procesar los contenedores de imagen aquí - dejar que procesarImagenesBase64DelMensaje
+        // maneje todo el contexto, incluyendo la alineación del elemento padre
+        // Solo limpiar eventos de las imágenes directamente
         if ($html !== null && trim($html) !== '') {
             $html = preg_replace_callback(
                 '/<img([^>]*)>/i', 

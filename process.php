@@ -33,15 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message = $_POST['mensaje'] ?? '';
     
     // LOGGING TEMPORAL PARA DEBUG - INICIO
-    error_log("=== DEBUG PROCESS.PHP ===");
-    error_log("Message length: " . strlen($message));
-    error_log("Message content: " . $message);
-    error_log("Number of images in message: " . preg_match_all('/<img[^>]*>/i', $message, $matches));
-    
-    // Dividir por imágenes para ver contenido antes/después
-    $parts = preg_split('/<img[^>]*>/i', $message);
-    error_log("Parts after splitting by images: " . print_r($parts, true));
-    error_log("========================");
+    // error_log("=== DEBUG PROCESS.PHP ===");
+    // error_log("Message length: " . strlen($message));
+    // error_log("Message content: " . $message);
+    // error_log("Number of images in message: " . preg_match_all('/<img[^>]*>/i', $message, $matches));
+    // $parts = preg_split('/<img[^>]*>/i', $message);
+    // error_log("Parts after splitting by images: " . print_r($parts, true));
+    // error_log("========================");
     // LOGGING TEMPORAL PARA DEBUG - FIN
     
     // Validar campos requeridos
@@ -111,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 $mail->Body = $mensajeFinal;
+                
+                // DEBUG: Log del HTML final que se envía
+                // error_log("DEBUG: HTML FINAL ENVIADO: " . $mensajeFinal);
                 
                 $mail->send();
                 $enviados++;

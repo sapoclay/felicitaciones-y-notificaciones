@@ -120,7 +120,7 @@ function insertImage() {
                 const imgHtml = `
                     <div class="image-container" style="position: relative; display: block; margin: 10px 0; text-align: inherit;">
                         <img id="${imgId}" src="${e.target.result}" alt="Imagen insertada" 
-                             style="max-width: ${width}px; max-height: ${height}px; width: auto; height: auto; display: inline-block; border-radius: 4px; cursor: pointer;" 
+                             style="width: ${width}px; height: auto; display: inline-block; border-radius: 4px; cursor: pointer;" 
                              onclick="showImageControls('${imgId}')" 
                              ondblclick="resizeImage(this)"
                              title="Clic para mostrar controles, doble clic para redimensionar">
@@ -171,9 +171,12 @@ function hideImageControls(imgId) {
 function quickResize(imgId, width) {
     const img = document.getElementById(imgId);
     if (img) {
-        img.style.maxWidth = width + 'px';
-        img.style.width = 'auto';
+        // Usar width directo en lugar de max-width para compatibilidad con email
+        img.style.width = width + 'px';
         img.style.height = 'auto';
+        // Remover max-width si existe
+        img.style.maxWidth = '';
+        img.style.maxHeight = '';
         
         updateHiddenTextarea();
         mostrarNotificacion(`Imagen redimensionada a ${width}px de ancho`, 'exito');
@@ -189,9 +192,12 @@ function customResize(imgId) {
     const newWidth = prompt('Ingrese el ancho deseado en píxeles:', currentWidth);
     
     if (newWidth && !isNaN(newWidth) && parseInt(newWidth) > 0) {
-        img.style.maxWidth = parseInt(newWidth) + 'px';
-        img.style.width = 'auto';
+        // Usar width directo en lugar de max-width para compatibilidad con email
+        img.style.width = parseInt(newWidth) + 'px';
         img.style.height = 'auto';
+        // Remover max-width si existe
+        img.style.maxWidth = '';
+        img.style.maxHeight = '';
         
         updateHiddenTextarea();
         mostrarNotificacion(`Imagen redimensionada a ${parseInt(newWidth)}px de ancho`, 'exito');
@@ -226,9 +232,12 @@ function resizeImage(img) {
             newWidth = parseInt(newWidth);
         }
         
-        img.style.maxWidth = newWidth + 'px';
-        img.style.width = 'auto';
+        // Usar width directo en lugar de max-width para compatibilidad con email
+        img.style.width = newWidth + 'px';
         img.style.height = 'auto';
+        // Remover max-width si existe
+        img.style.maxWidth = '';
+        img.style.maxHeight = '';
         
         updateHiddenTextarea();
         mostrarNotificacion(`Imagen redimensionada a ${newWidth}px de ancho`, 'exito');
