@@ -1,187 +1,153 @@
-# Sistema de envío de correos 
+# 📧 Sistema de Envío de Correos Masivos
 
-Este sistema permite enviar correos electrónicos de felicitación y promociones a clientes en su fecha de alta. El sistema lee los datos desde un archivo Excel y permite enviar correos personalizados con imágenes adjuntas.
+Sistema profesional para envío masivo de correos electrónicos con imágenes HTML incrustadas, desarrollado en PHP con arquitectura MVC.
 
-![envio-felicitaciones](https://github.com/user-attachments/assets/6da68474-5d6c-4e1f-a523-c5aebe4fc839)
+## 🎯 Características Principales
 
-> **Nota:** el archivo generar_excel solo ha sido creado para crear un archivo xlsx de ejemplo. De forma automática los > datos se tomarán del archivo empresas_[dd-mm-YYYY].xlsx que debe situarse en el directorio del proyecto. También se   > puede seleccionar desde el selector de la configuración del programa dentro de la interfaz.
-> Desde el directorio de la aplicación con: php generar_excel.php debería ejecutarse correctamente el archivo y generar > el .xlsx de forma automática.
+### ✨ Funcionalidades Base
+- **Editor WYSIWYG avanzado**: Editor visual TinyMCE con formato de texto e inserción de imágenes
+- **Carga automática de Excel**: Procesa archivos con formato `empresas_DD-MM-YYYY.xlsx`
+- **SMTP múltiple**: Compatible con Gmail, Outlook y servidores personalizados
+- **Progreso en tiempo real**: Seguimiento AJAX del proceso de envío
+- **Filtros por tratamiento**: Segmentación de envíos por tipos de servicio
 
-## Requisitos del sistema
+### 🚀 Mejoras Implementadas (Junio 2025)
+- **✅ Alineación perfecta de imágenes**: Las imágenes del editor respetan la alineación configurada usando tablas HTML para máxima compatibilidad con todos los clientes de correo electrónico
+- **✅ Imágenes embebidas sin duplicados**: Eliminación de adjuntos tradicionales redundantes, manteniendo solo imágenes embebidas con CID únicos
+- **✅ Enlaces clickeables funcionales**: Las imágenes adjuntas incluyen enlaces completamente funcionales y clickeables
+- **✅ Prevención de reenvíos (PRG)**: Implementación del patrón Post-Redirect-Get para evitar el reenvío accidental de formularios al recargar la página
+- **✅ Corrección PHP 8+**: Resolución completa de advertencias de deprecación relacionadas con valores nulos en expresiones regulares
+- **🆕 Restricciones de tamaño optimizadas**: Límite máximo de 2MB por imagen para compatibilidad con servidores en la nube, con validaciones tanto en cliente como servidor
+- **🆕 Sistema unificado de imágenes**: Las imágenes del editor ahora se comportan exactamente igual que las adjuntas (embebidas con CID), manteniendo la alineación configurada
+- **✅ Corrección crítica completada**: Resuelto completamente el problema de contenido perdido cuando el mensaje contenía imágenes del editor. La nueva implementación con sistema de placeholders únicos garantiza la conservación total del contenido (ver `CORRECCION_CUERPO_VACIO.md`)
 
-### Requisitos de servidor
-- PHP 7.4 o superior
-- Servidor web (Apache/Nginx)
-- Extensiones PHP requeridas:
-  - php-mbstring
-  - php-zip
-  - php-xml
-  - php-gd
-  - php-mysql
-  - php-curl
-  - php-openssl (para conexiones SMTP seguras)
+## 🛠️ Tecnologías
 
-### Dependencias (gestionadas por composer)
-- PHPMailer/PHPMailer
-- PHPOffice/PhpSpreadsheet
-- Otras dependencias están listadas en `composer.json`
+- **Backend**: PHP 7.4+ / PHP 8+, PHPMailer 6.x, PhpSpreadsheet
+- **Frontend**: HTML5, CSS3, JavaScript ES6, TinyMCE 6
+- **Arquitectura**: MVC (Model-View-Controller)
+- **Compatibilidad**: Todos los clientes de correo electrónico (Outlook, Gmail, Apple Mail, etc.)
 
-## Instalación
+## 📁 Estructura
 
-1. Clonar el repositorio o copiar los archivos al servidor web
-2. Ejecutar:
+```
+├── index.php              # Punto de entrada
+├── process.php            # Controlador principal
+├── config.json            # Configuración SMTP
+├── includes/functions.php # Lógica de negocio
+├── views/main.php         # Interfaz usuario
+├── assets/js/main.js      # JavaScript frontend
+└── utils/generar_excel.php # Generador Excel de ejemplo
+```
+
+## 📊 Formato Excel Requerido
+
+Archivo: `empresas_DD-MM-YYYY.xlsx` con 15 columnas (A-O):
+
+| Col | Campo | Requerido | Ejemplo |
+|-----|-------|-----------|---------|
+| A   | Código | ✅ | EMP001 |
+| B   | Nombre | ✅ | Juan Pérez García |
+| C   | Nombre Comercial | - | Mi Empresa S.L. |
+| D   | Dirección | - | Calle Mayor 123 |
+| E   | CIF | - | B12345678 |
+| F   | Localidad | - | Madrid |
+| G   | Provincia | - | Madrid |
+| H   | C. Postal | - | 28001 |
+| I   | País | - | España |
+| J   | Teléfono | - | 912345678 |
+| K   | Fax | - | 912345679 |
+| L   | **Email** | ✅ | juan@empresa.com |
+| M   | Contacto | - | 684551555 |
+| N   | **Fecha Alta** | ✅ | 05-06-2025 |
+| O   | **Tratamientos** | ✅ | Estética, Peluquería |
+
+## ⚙️ Instalación
+
+1. **Instalar dependencias**
 ```bash
+git clone https://github.com/sapoclay/felicitaciones-y-notificaciones.git
+cd felicitaciones-y-promociones
 composer install
 ```
-En Windows es necesario descargar composer desde su [sitio web](https://getcomposer.org/)
-3. Asegurarse de que los permisos de archivos son correctos:
+Si usas windows, composer se debe [descargar desde su página web](https://getcomposer.org/)
+
+2. **Generar Excel ejemplo** (opcional)
 ```bash
-chmod 755 -R /ruta/al/proyecto
-chmod 777 -R /ruta/al/proyecto/archivos_temporales
-chmod 666 /ruta/al/proyecto/config.json
+php utils/generar_excel.php
 ```
 
-## Estructura de Archivos
-
-- `index.php` - Archivo principal de la aplicación
-- `generar_excel.php` - Script para generar el archivo Excel de ejemplo
-- `cargar_excel.php` - Script para procesar la carga de archivos Excel
-- `update_config.php` - Script para actualizar la configuración SMTP
-- `config.json` - Archivo de configuración del servidor SMTP
-- `styles.css` - Estilos de la aplicación
-- `empresas_[fecha].xlsx` - Archivo Excel con los datos de los clientes
-
-## Configuración
-
-![envio-felicitaciones-configuracion](https://github.com/user-attachments/assets/c082f248-d704-44e5-9baa-400535d0fb30)
-
-### Configuración del servidor SMTP
-La configuración SMTP se gestiona a través de una interfaz gráfica en el panel lateral de la aplicación. Los parámetros configurables son:
-
-- Servidor SMTP (host)
-- Usuario SMTP (username)
-- Email del remitente (from_email)
-- Contraseña (password)
-- Puerto (port)
-  - 465 para SSL
-  - 587 para TLS
-- Nombre del remitente (from_name)
-- Seguridad (secure)
-  - SSL
-  - TLS
-
-Ejemplo de configuración en `config.json`:
+3. **Configurar SMTP** - Configuración del archivo `config.json`. Esto se puede configurar desde la interfaz del programa:
 ```json
 {
     "smtp": {
-        "host": "mail.tudominio.com",
-        "username": "tu@email.com",
-        "password": "tu_contraseña",
-        "port": 465,
+        "host": "smtp.gmail.com",
+        "username": "tu@email.com", 
+        "password": "tu_password",
+        "port": 587,
+        "secure": "tls",
         "from_email": "tu@email.com",
-        "from_name": "Tu Nombre",
-        "secure": "ssl"
+        "from_name": "Tu Nombre"
     }
 }
 ```
 
-### Estructura del Excel
-El archivo Excel debe contener las siguientes columnas:
-- Código (columna A)
-- Nombre (columna B, formato: "Apellido1 Apellido2 Nombre")
-- Email (columna L)
-- Fecha Alta (columna M, formato: "dd-mm-yyyy")
+## 🚀 Uso
 
-## Características
+1. Abrir `index.php` en navegador
+2. Configurar SMTP (panel lateral ☰)
+3. Cargar Excel o generar automáticamente
+4. Escribir mensaje con editor
+5. Adjuntar imágenes con enlaces
+6. Filtrar destinatarios por tratamiento
+7. Enviar y monitorear progreso
 
-1. **Panel de Configuración**
-   - Interfaz gráfica para configuración SMTP
-   - Selector de archivos Excel con validación
-   - Guardado automático de configuración
-   - Visualización de campos requeridos
+## 🖼️ Funcionalidad imágenes
 
-2. **Selección de Destinatarios**
-   - Selección múltiple de destinatarios
-   - Botón "Seleccionar Todos"
-   - Muestra información detallada de cada destinatario
-   - Filtrado automático por fecha de alta
+- **Base64**: Imágenes incrustadas directamente en HTML
+- **Enlaces**: URLs opcionales por imagen 
+- **Responsive**: Se adapta automáticamente
+- **Compatibilidad**: Funciona en todos los clientes de correo (al menos en todos lo que he probado)
+- **🆕 Restricciones de tamaño**: Máximo 2MB por imagen para compatibilidad con servidores en la nube
+- **🆕 Validación dual**: Control de tamaño tanto en JavaScript (cliente) como PHP (servidor)
+- **🆕 Sistema unificado**: Las imágenes del editor se procesan como adjuntos embebidos igual que las tradicionales, preservando la alineación
 
-3. **Envío de Correos**
-   - Soporte para HTML en el contenido
-   - Personalización con nombre del destinatario
-   - Barra de progreso en tiempo real
-   - Gestión de errores y notificaciones
-   - Reintento automático en caso de fallo
+### Limitaciones de Tamaño
+El sistema ahora incluye restricciones de 2MB por imagen para garantizar compatibilidad con servicios de hosting en la nube:
+- **Validación del cliente**: JavaScript previene la carga de archivos grandes antes del procesamiento
+- **Validación del servidor**: PHP verifica el tamaño tanto de archivos adjuntos como imágenes del editor
+- **Mensajes informativos**: La interfaz informa claramente sobre las restricciones de tamaño
 
-4. **Gestión de Imágenes**
-   - Permite adjuntar hasta 5 imágenes
-   - Previsualización de imágenes
-   - Eliminación individual de imágenes
-   - Validación de tipos de archivo
-   - Comprobación de tamaño máximo
+## 🔧 Configuración SMTP
 
-5. **Notificaciones**
-   - Mensajes de éxito/error
-   - Notificaciones de progreso
-   - Animaciones suaves
-   - Tiempo de desvanecimiento automático
+**Gmail** (requiere contraseña de aplicación):
+```json
+{"host": "smtp.gmail.com", "port": 587, "secure": "tls"}
+```
 
-## Uso
+**Outlook**:
+```json
+{"host": "smtp-mail.outlook.com", "port": 587, "secure": "tls"}
+```
 
-1. Configuración inicial:
-   - Acceder al panel lateral (botón ☰)
-   - Configurar los datos del servidor SMTP
-   - Subir el archivo Excel de datos
+**Servidor personalizado**:
+```json
+{"host": "mail.tudominio.com", "port": 465, "secure": "ssl"}
+```
 
-2. Preparación del archivo Excel:
-   - Usar el formato especificado
-   - Guardar en formato .xlsx
-   - Asegurar que las fechas estén en formato dd-mm-yyyy
+## 🔍 Solución problemas
 
-3. Envío de correos:
-   - Seleccionar destinatarios
-   - Escribir asunto y mensaje
-   - Opcionalmente adjuntar imágenes
-   - Enviar y monitorear el progreso
+- **Excel no carga**: Verificar nombre `empresas_DD-MM-YYYY.xlsx` y 15 columnas
+- **Error SMTP**: Comprobar credenciales y puerto (587/TLS o 465/SSL)
+- **🆕 Imágenes demasiado grandes**: El sistema ahora rechaza imágenes mayores a 2MB automáticamente
+- **🆕 Configuración del servidor**: Ya no es necesario modificar `upload_max_filesize` o `post_max_size` en PHP - el sistema maneja las restricciones internamente
 
-## Seguridad
-- Validación de tipos de archivo para imágenes
-- Sanitización de datos de entrada
-- Protección contra inyección de código
-- Manejo seguro de sesiones
-- Conexión SMTP segura (SSL/TLS)
-- Protección contra CSRF
-- Validación de correos electrónicos
-- Límite de tamaño en archivos
+### Migración desde versiones anteriores
+Si actualizas desde una versión anterior que dependía de configuraciones PHP modificadas:
+1. Las nuevas validaciones son automáticas y no requieren cambios de configuración
+2. El sistema mantendrá compatibilidad con configuraciones existentes como respaldo
+3. Se recomienda probar el envío con imágenes de diferentes tamaños para verificar el funcionamiento
 
-## Solución de problemas
+## ✨ Desarrolladores ✨ 
 
-1. **Error de permisos**
-   - Verificar que config.json tiene permisos 666
-   - Verificar permisos en el directorio de subidas
-   - Comprobar permisos del usuario web
-
-2. **Errores de SMTP**
-   - Verificar credenciales SMTP
-   - Comprobar configuración SSL/TLS
-   - Verificar puertos (465 para SSL, 587 para TLS)
-   - Comprobar configuración del firewall
-   - Verificar que el email del remitente coincide con el usuario SMTP
-
-3. **Problemas con Excel**
-   - Verificar formato de fecha (dd-mm-yyyy)
-   - Comprobar estructura de columnas
-   - Asegurar que es formato .xlsx
-
-4. **Problemas con imágenes**
-   - Verificar límites de tamaño de archivo en PHP
-   - Comprobar extensiones PHP necesarias
-   - Verificar permisos de escritura temporales
-
-## Mantenimiento
-- Revisar logs de errores PHP
-- Monitorear espacio en disco
-- Verificar permisos de archivos
-- Actualizar dependencias regularmente
-- Hacer copias de seguridad de config.json
-
+**Javier** - Backend (modelo) | **Michel** - Frontend (vista) | **[entreunosyceros](https://entreunosyceros.net)** - Arquitectura y desarrollo (controlador)

@@ -1,16 +1,19 @@
 <?php
 
-require 'vendor/autoload.php';
+// Establecer zona horaria correcta
+date_default_timezone_set('Europe/Madrid');
+
+require __DIR__ . '/../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 // Cargar configuración
 function loadConfig() {
-    $configFile = __DIR__ . '/config.json';
+    $configFile = __DIR__ . '/../config.json';
     $defaultConfig = [
         'excel' => [
-            'path' => __DIR__,
+            'path' => __DIR__ . '/..',
             'filename' => 'empresas_{date}.xlsx'
         ]
     ];
@@ -52,7 +55,8 @@ $headers = [
     'K1' => 'Fax',
     'L1' => 'Email',
     'M1' => 'Contacto',
-    'N1' => 'Fecha Alta'
+    'N1' => 'Fecha Alta',
+    'O1' => 'Tratamientos'
 ];
 
 // Aplicar encabezados y estilo
@@ -64,29 +68,37 @@ foreach ($headers as $cell => $header) {
 // Datos de ejemplo
 $data = [
     [
+        'EMP003', 'Barreiro Algomás Javier', 'Cangas (y alrededores)', 'Plaza del Sol Ecillo 7', 'X1234567Y',
+        'Valencia', 'Valencia', '46001', 'España', '963789012', '963789013', 'jbarreiro.23@gmail.com', '684551555', '06-06-1980', 'Peluquería'
+    ],
+    [
         'EMP001', 'Pruebando Ando María José', 'TecnoChunda', 'Calle Más Mayor 123', 'B12345678',
-        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'siyofueramuyrico@gmail.com', '684551555','04-06-2024'
+        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'siyofueramuyrico@gmail.com', '684551555','06-06-2024', 'Peluquería, Estética, Masajes'
     ],
     [
         'EMP002', 'Trocipurcio Rostinguelrs Mario Jacinto', 'DistRápida', 'Arvenida Primogénica 45', 'A87654321',
-        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', 'siyofuerarico@msn.com','684551555', '04-06-1980'
-    ],
-    [
-        'EMP003', 'Chanchurcio Grande María Antonia', 'SPermaT', 'Plaza del Sol Ecillo 7', 'X1234567Y',
-        'Valencia', 'Valencia', '46001', 'España', '963789012', '963789013', 'info@andromenaguer.es', '684551555', '04-06-1980'
+        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', 'siyofuerarico@msn.com','684551555', '06-06-1980', 'Manicura, Estética'
     ],
     [
         'EMP004', 'Construcciones Martínez e Hijos', 'Pintamelón', 'Calle Juela 234', 'B98765432',
-        'Sevilla', 'Sevilla', '41001', 'España', '954567890', '954567891', 'info@colifrondio.es', '684551555', '03-06-1980'
+        'Sevilla', 'Sevilla', '41001', 'España', '954567890', '954567891', 'info@colifrondio.es', '684551555', '06-06-1980', 'Masajes, Peluquería'
     ],
     [
         'EMP005', 'Suministros Médicos López S.L.', 'MedioLópez', 'Avenida de la poca Salud 69', 'B45678901',
-        'Bilbao', 'Vizcaya', '48001', 'España', '944789123', '944789124', 'contarto@massachupets.es', '684551555', '03-06-1980'
+        'Bilbao', 'Vizcaya', '48001', 'España', '944789123', '944789124', 'contarto@massachupets.es', '684551555', '03-06-1980', 'Pedicura, Peluquería, Estética'
     ],
     [
         'EMP006', 'Franchuncio Wend Benancio', 'MedioChancho', 'Avenida Zinganillo 345', 'F8754321',
-        'Wisconsyn', 'Alpedrete', '08074', 'España', '933456789', '937777780', 'tikitoke393941@mail.com', '684551555', '03-06-1970'
+        'Wisconsyn', 'Alpedrete', '08074', 'España', '933456789', '937777780', 'tikitoke393941@mail.com', '684551555', '03-06-1970', 'Estética'
     ],
+    [
+        'EMP007', 'Nada Nada NADA', 'DistRápida', 'Arvenida Primogénica 45', 'A87654321',
+        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', '','684551555', '05-06-1980', 'Peluquería, Estética, Masajes'
+    ],
+    [
+        'EMP008', 'Awakanome Edeumerito Mondongo', 'Mondon-Guillo', 'Camiño Corto 5', 'A87874321',
+        'Castilla', 'Alcafran', '08301', 'España', '9334533289', '934456780', 'mondongo@duro.com','684551500', '05-06-1980', 'Drenaje, Estética, Masajes'
+    ]
     
 ];
 
@@ -102,7 +114,7 @@ foreach ($data as $rowData) {
 }
 
 // Autoajustar anchos de columna
-foreach (range('A', 'N') as $col) {
+foreach (range('A', 'O') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
