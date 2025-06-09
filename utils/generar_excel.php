@@ -73,11 +73,11 @@ $data = [
     ],
     [
         'EMP001', 'Pruebando Ando María José', 'TecnoChunda', 'Calle Más Mayor 123', 'B12345678',
-        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'sudaquetesuda@mail.com', '684551555','06-06-2024', 'Peluquería, Estética, Masajes'
+        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'siyofueramuyrico@gmail.com', '684551555','06-06-2024', 'Peluquería, Estética, Masajes'
     ],
     [
         'EMP002', 'Trocipurcio Rostinguelrs Mario Jacinto', 'DistRápida', 'Arvenida Primogénica 45', 'A87654321',
-        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', 'chanchunai@mail.com','684551555', '06-06-1980', 'Manicura, Estética'
+        'Barcelona', 'Barcelona', '08001', 'España', '933456789', '933456780', 'siyofuerarico@msn.com','684551555', '06-06-1980', 'Manicura, Estética'
     ],
     [
         'EMP004', 'Construcciones Martínez e Hijos', 'Pintamelón', 'Calle Juela 234', 'B98765432',

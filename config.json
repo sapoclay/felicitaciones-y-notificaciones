@@ -1,11 +1,11 @@
 {
     "smtp": {
-        "host": "",
-        "username": "",
-        "password": "",
+        "host": "mail.entreunosyceros.net",
+        "username": "pruebas@entreunosyceros.net",
+        "password": "entreunosyceros82",
         "port": 465,
-        "from_email": "",
-        "from_name": "",
+        "from_email": "pruebas@entreunosyceros.net",
+        "from_name": "Dami\u00e1n",
         "secure": "ssl"
     }
 }
