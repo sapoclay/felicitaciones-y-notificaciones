@@ -116,9 +116,69 @@ function insertImage() {
                     height = maxHeight;
                 }
                 
+                // Detectar la alineación actual del cursor/selección
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                let currentAlignment = 'left'; // Por defecto
+                
+                // Buscar en el elemento padre más cercano la alineación CSS
+                let element = range.commonAncestorContainer;
+                if (element.nodeType === Node.TEXT_NODE) {
+                    element = element.parentElement;
+                }
+                
+                // Método mejorado: verificar múltiples formas de alineación
+                while (element && element !== document.getElementById('contenido_mensaje')) {
+                    const computedStyle = window.getComputedStyle(element);
+                    const textAlign = computedStyle.textAlign;
+                    
+                    // Verificar tanto computed style como atributos inline
+                    if (textAlign && textAlign !== 'start' && textAlign !== 'end' && textAlign !== 'initial') {
+                        currentAlignment = textAlign;
+                        break;
+                    }
+                    
+                    // También verificar el atributo align (usado por algunos navegadores)
+                    const alignAttr = element.getAttribute('align');
+                    if (alignAttr && ['left', 'center', 'right', 'justify'].includes(alignAttr.toLowerCase())) {
+                        currentAlignment = alignAttr.toLowerCase();
+                        break;
+                    }
+                    
+                    // Verificar estilo inline
+                    const style = element.getAttribute('style');
+                    if (style) {
+                        const match = style.match(/text-align:\s*(left|center|right|justify)/i);
+                        if (match) {
+                            currentAlignment = match[1].toLowerCase();
+                            break;
+                        }
+                    }
+                    
+                    element = element.parentElement;
+                }
+                
+                // Si no se encontró alineación específica, verificar el contenedor del editor
+                if (currentAlignment === 'left') {
+                    const editorStyle = window.getComputedStyle(document.getElementById('contenido_mensaje'));
+                    if (editorStyle.textAlign && editorStyle.textAlign !== 'start' && editorStyle.textAlign !== 'end' && editorStyle.textAlign !== 'initial') {
+                        currentAlignment = editorStyle.textAlign;
+                    }
+                }
+                
+                // Forzar la alineación en el contenedor para asegurar compatibilidad
+                let alignmentStyle = currentAlignment;
+                if (currentAlignment === 'center') {
+                    alignmentStyle = 'center';
+                } else if (currentAlignment === 'right') {
+                    alignmentStyle = 'right';
+                } else {
+                    alignmentStyle = 'left';
+                }
+                
                 const imgId = 'img_' + Date.now();
                 const imgHtml = `
-                    <div class="image-container" style="position: relative; display: block; margin: 10px 0; text-align: inherit;">
+                    <div class="image-container" style="position: relative; display: block; margin: 10px 0; text-align: ${alignmentStyle};">
                         <img id="${imgId}" src="${e.target.result}" alt="Imagen insertada" 
                              style="width: ${width}px; height: auto; display: inline-block; border-radius: 4px; cursor: pointer;" 
                              onclick="showImageControls('${imgId}')" 
@@ -129,6 +189,9 @@ function insertImage() {
                             <button type="button" onclick="quickResize('${imgId}', 400)" style="background: #2196F3; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Mediano (400px)">M</button>
                             <button type="button" onclick="quickResize('${imgId}', 600)" style="background: #2196F3; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Grande (600px)">L</button>
                             <button type="button" onclick="customResize('${imgId}')" style="background: #FF9800; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Tamaño personalizado">...</button>
+                            <button type="button" onclick="alignImage('${imgId}', 'left')" style="background: #4CAF50; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Alinear izquierda">⬅</button>
+                            <button type="button" onclick="alignImage('${imgId}', 'center')" style="background: #4CAF50; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Centrar">⬛</button>
+                            <button type="button" onclick="alignImage('${imgId}', 'right')" style="background: #4CAF50; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Alinear derecha">➡</button>
                             <button type="button" onclick="hideImageControls('${imgId}')" style="background: #f44336; color: white; border: none; padding: 4px 8px; margin: 0 2px; border-radius: 3px; font-size: 11px; cursor: pointer;" title="Cerrar controles">×</button>
                         </div>
                     </div>
@@ -181,6 +244,19 @@ function quickResize(imgId, width) {
         updateHiddenTextarea();
         mostrarNotificacion(`Imagen redimensionada a ${width}px de ancho`, 'exito');
         hideImageControls(imgId);
+    }
+}
+
+function alignImage(imgId, alignment) {
+    const img = document.getElementById(imgId);
+    if (img) {
+        const container = img.closest('.image-container');
+        if (container) {
+            container.style.textAlign = alignment;
+            updateHiddenTextarea();
+            mostrarNotificacion(`Imagen alineada a la ${alignment === 'left' ? 'izquierda' : alignment === 'right' ? 'derecha' : 'centro'}`, 'exito');
+            hideImageControls(imgId);
+        }
     }
 }
 

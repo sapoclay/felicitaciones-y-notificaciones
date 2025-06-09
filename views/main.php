@@ -27,6 +27,7 @@
                         <li><strong>Nombre</strong> (columna B)</li>
                         <li><strong>Email</strong> (columna L)</li>
                         <li><strong>Fecha Alta</strong> (columna N)</li>
+                        <li><strong>Tratamientos</strong> (columna 0)</li>
                     </ul>
                 </small>
             </div>

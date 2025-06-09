@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->Body = $mensajeFinal;
                 
                 // DEBUG: Log del HTML final que se envía
-                // error_log("DEBUG: HTML FINAL ENVIADO: " . $mensajeFinal);
+                error_log("DEBUG: HTML FINAL ENVIADO: " . $mensajeFinal);
                 
                 $mail->send();
                 $enviados++;

@@ -437,14 +437,55 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
                 $imgTag = '<img src="cid:' . $cid . '"' . $atributosImg . '>';
                 // error_log("DEBUG: IMG tag final: " . $imgTag);
                 // error_log("DEBUG: Alineación aplicada: " . $alineacion);
-                if ($alineacion === 'center') {
-                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="text-align:center;">' . $imgTag . '</td></tr></table>';
-                } elseif ($alineacion === 'right') {
-                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="right" style="text-align:right;">' . $imgTag . '</td></tr></table>';
-                } elseif ($alineacion === 'left') {
-                    $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="left" style="text-align:left;">' . $imgTag . '</td></tr></table>';
+                
+                // MODO DEBUG: Si está activado, generar múltiples versiones para comparar
+                if (activarModoPruebaAlineacion()) {
+                    $alternativas = generarAlternativasAlineacion($imgTag, $alineacion);
+                    $imgConCid = '<div style="border:2px solid #ff0000;margin:20px 0;padding:10px;">';
+                    $imgConCid .= '<h3 style="color:#ff0000;margin:0 0 10px 0;">MODO DEBUG - Comparando técnicas para: ' . $alineacion . '</h3>';
+                    foreach ($alternativas as $nombre => $html) {
+                        $imgConCid .= '<div style="border:1px solid #ccc;margin:10px 0;padding:10px;">';
+                        $imgConCid .= '<h4 style="margin:0 0 5px 0;background:#f0f0f0;padding:5px;">' . $nombre . '</h4>';
+                        $imgConCid .= $html;
+                        $imgConCid .= '</div>';
+                    }
+                    $imgConCid .= '</div>';
                 } else {
-                    $imgConCid = $imgTag;
+                    if ($alineacion === 'center') {
+                        // Estructura robusta para centrar en todos los clientes (incluido Outlook)
+                        $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td align="center" valign="top" style="text-align:center;padding:0;">'
+                            . '<!--[if mso | IE]>'
+                            . '<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">'
+                            . '<![endif]-->'
+                            . '<div align="center" style="display:inline-block;text-align:center;margin:0 auto;">'
+                            . $imgTag .
+                            '</div>'
+                            . '<!--[if mso | IE]>'
+                            . '</td></tr></table>'
+                            . '<![endif]-->'
+                            . '</td></tr></table>';
+                    } elseif ($alineacion === 'right') {
+                        $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0;mso-table-lspace:0pt;mso-table-rspace:0pt;">'
+                            . '<tr><td align="right" valign="top" style="text-align:right!important;padding:0;">'
+                            . '<!--[if mso | IE]>'
+                            . '<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="right">'
+                            . '<![endif]-->'
+                            . '<table align="right" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 0 auto;mso-table-lspace:0pt;mso-table-rspace:0pt;">'
+                            . '<tr><td align="right" style="text-align:right;">'
+                            . $imgTag .
+                            '</td></tr></table>'
+                            . '<!--[if mso | IE]>'
+                            . '</td></tr></table>'
+                            . '<![endif]-->'
+                            . '</td></tr></table>';
+                    } elseif ($alineacion === 'left') {
+                        $imgConCid = $imgTag;
+                    } else {
+                        $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0;mso-table-lspace:0pt;mso-table-rspace:0pt;">'
+                            . '<tr><td align="center" valign="top" style="text-align:center;padding:0;">'
+                            . $imgTag .
+                            '</td></tr></table>';
+                    }
                 }
                 $reemplazos[$placeholder] = $imgConCid;
                 $mensajeProcesado = str_replace($imagenCompleta, $placeholder, $mensajeProcesado);
@@ -458,7 +499,7 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
         
         // Limpiar espacios extra pero mantener estructura HTML básica
         $mensajeProcesado = preg_replace('/\s{2,}/', ' ', $mensajeProcesado); // Múltiples espacios a uno
-        $mensajeProcesado = preg_replace('/\s*\n\s*/', '\n', $mensajeProcesado); // Limpiar saltos de línea
+        $mensajeProcesado = preg_replace('/\s*\n\s*/', '', $mensajeProcesado); // Eliminar saltos de línea
         $mensajeProcesado = trim($mensajeProcesado);
         
         // Si el mensaje queda vacío después del procesamiento, usar un mensaje mínimo
@@ -635,6 +676,71 @@ function limpiarHTMLEditor($html) {
         // En caso de error, devolver HTML original o string vacío
         return $html ?? '';
     }
+}
+
+/**
+ * DEBUG: Función para probar diferentes métodos de alineación
+ * Esta función permite testear varios enfoques para encontrar el más compatible
+ */
+function generarAlternativasAlineacion($imgTag, $alineacion) {
+    $alternativas = [];
+    
+    // Método 1: Tabla robusta (actual)
+    if ($alineacion === 'right') {
+        $alternativas['tabla_robusta'] = '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+            <tr><td align="right" valign="top" style="text-align:right!important;padding:0;">
+                <!--[if mso]>
+                <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="right">
+                <![endif]-->
+                <div align="right" style="text-align:right!important;margin:0 0 0 auto;display:inline-block;">
+                    ' . $imgTag . '
+                </div>
+                <!--[if mso]>
+                </td></tr></table>
+                <![endif]-->
+            </td></tr>
+        </table>';
+    }
+    
+    // Método 2: Float derecho (para clientes que soportan CSS)
+    if ($alineacion === 'right') {
+        $alternativas['float_derecho'] = '<div style="text-align:right;margin:10px 0;">
+            <div style="float:right;clear:both;">
+                ' . $imgTag . '
+            </div>
+            <div style="clear:both;height:0;line-height:0;">&nbsp;</div>
+        </div>';
+    }
+    
+    // Método 3: Flexbox (moderno, para clientes que lo soporten)
+    if ($alineacion === 'right') {
+        $alternativas['flexbox'] = '<div style="display:flex;justify-content:flex-end;margin:10px 0;">
+            ' . $imgTag . '
+        </div>';
+    }
+    
+    // Método 4: Tabla simple con margin auto
+    if ($alineacion === 'right') {
+        $alternativas['tabla_margin'] = '<table align="right" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 10px auto;">
+            <tr><td>' . $imgTag . '</td></tr>
+        </table>';
+    }
+    
+    // Método 5: Paragraph con text-align
+    if ($alineacion === 'right') {
+        $alternativas['paragraph_align'] = '<p style="text-align:right;margin:10px 0;">
+            ' . $imgTag . '
+        </p>';
+    }
+    
+    return $alternativas;
+}
+
+/**
+ * DEBUG: Activar modo de prueba con todas las alternativas
+ */
+function activarModoPruebaAlineacion() {
+    return isset($_GET['debug_alignment']) && $_GET['debug_alignment'] === '1';
 }
 ?>
 

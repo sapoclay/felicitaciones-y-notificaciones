@@ -143,7 +143,7 @@ El sistema ahora incluye restricciones de 2MB por imagen para garantizar compati
 
 - **Excel no carga**: Verificar nombre `empresas_DD-MM-YYYY.xlsx` y 15 columnas
 - **Error SMTP**: Comprobar credenciales y puerto (587/TLS o 465/SSL)
-- **🆕 Imágenes demasiado grandes**: El sistema ahora rechaza imágenes mayores a 2MB automáticamente
+- **🆕 Imágenes demasiado grandes**: El sistema rechaza imágenes mayores a 2MB automáticamente
 - **🆕 Configuración del servidor**: Ya no es necesario modificar `upload_max_filesize` o `post_max_size` en PHP - el sistema maneja las restricciones internamente
 
 ### Migración desde versiones anteriores
@@ -154,4 +154,6 @@ Si actualizas desde una versión anterior que dependía de configuraciones PHP m
 
 ## ✨ Desarrolladores ✨ 
 
-**Javier** - Backend (modelo) | **Michel** - Frontend (vista) | **[entreunosyceros](https://entreunosyceros.net)** - Arquitectura y desarrollo (modelo, vista, controlador)
+**Javier** - Backend (modelo) | **Michel** - Frontend (vista) | **[entreunosyceros](https://entreunosyceros.net)** - Arquitectura y desarrollo
+
+[Repositorio en GITHUB](https://github.com/sapoclay/felicitaciones-y-notificaciones)
