@@ -1116,13 +1116,32 @@ function initializeIconCollection() {
 
 // Función para abrir el selector de iconos
 function openIconPicker() {
+    console.log('🚀 Abriendo selector de iconos...');
+    
     const editor = document.getElementById('contenido_mensaje');
+    const modal = document.getElementById('iconPickerModal');
+    
+    // Verificar que los elementos existen
+    if (!editor) {
+        console.error('❌ No se encontró el editor con ID: contenido_mensaje');
+        alert('Error: No se encontró el editor de texto');
+        return;
+    }
+    
+    if (!modal) {
+        console.error('❌ No se encontró el modal con ID: iconPickerModal');
+        alert('Error: No se encontró el modal de iconos');
+        return;
+    }
+    
+    console.log('✅ Elementos encontrados correctamente');
     
     // Guardar la posición actual del cursor
     if (editor.contains(document.activeElement) || editor === document.activeElement) {
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
             savedRange = selection.getRangeAt(0).cloneRange();
+            console.log('✅ Posición del cursor guardada');
         }
     } else {
         // Si el editor no tiene foco, enfocarlo y colocar el cursor al final
@@ -1134,13 +1153,16 @@ function openIconPicker() {
         selection.removeAllRanges();
         selection.addRange(range);
         savedRange = range.cloneRange();
+        console.log('✅ Editor enfocado y cursor colocado al final');
     }
     
     if (allIcons.length === 0) {
+        console.log('📦 Inicializando colección de iconos...');
         initializeIconCollection();
+        console.log(`✅ Colección inicializada con ${allIcons.length} iconos`);
     }
     
-    const modal = document.getElementById('iconPickerModal');
+    console.log('🎨 Mostrando modal...');
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
@@ -1149,8 +1171,16 @@ function openIconPicker() {
     
     // Enfocar el campo de búsqueda
     setTimeout(() => {
-        document.getElementById('iconSearch').focus();
+        const searchInput = document.getElementById('iconSearch');
+        if (searchInput) {
+            searchInput.focus();
+            console.log('🔍 Campo de búsqueda enfocado');
+        } else {
+            console.error('❌ No se encontró el campo de búsqueda');
+        }
     }, 100);
+    
+    console.log('🎉 Selector de iconos abierto exitosamente');
 }
 
 // Función para cerrar el selector de iconos
@@ -1178,13 +1208,22 @@ function closeIconPicker() {
 
 // Función para mostrar iconos por categoría
 function showIconCategory(category) {
+    console.log(`📂 Mostrando categoría: ${category}`);
+    
     currentIconCategory = category;
     
     // Actualizar botones de categoría
     document.querySelectorAll('.icon-category').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`[onclick="showIconCategory('${category}')"]`).classList.add('active');
+    
+    const activeButton = document.querySelector(`[onclick="showIconCategory('${category}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+        console.log(`✅ Botón de categoría '${category}' activado`);
+    } else {
+        console.error(`❌ No se encontró el botón para la categoría '${category}'`);
+    }
     
     // Obtener iconos de la categoría
     let iconsToShow = [];
@@ -1194,41 +1233,70 @@ function showIconCategory(category) {
         iconsToShow = iconCollection[category] || [];
     }
     
+    console.log(`📊 Iconos a mostrar: ${iconsToShow.length}`);
+    
     // Renderizar iconos
     renderIcons(iconsToShow);
 }
 
 // Función para renderizar iconos en la cuadrícula
 function renderIcons(icons) {
+    console.log(`🎨 Renderizando ${icons.length} iconos...`);
+    
     const iconGrid = document.getElementById('iconGrid');
+    if (!iconGrid) {
+        console.error('❌ No se encontró el elemento iconGrid');
+        return;
+    }
+    
     iconGrid.innerHTML = '';
     
-    icons.forEach(icon => {
+    if (icons.length === 0) {
+        iconGrid.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1/-1;">No hay iconos para mostrar</p>';
+        console.log('⚠️ No hay iconos para renderizar');
+        return;
+    }
+    
+    icons.forEach((icon, index) => {
         const iconElement = document.createElement('div');
         iconElement.className = 'icon-item';
         iconElement.textContent = icon;
         iconElement.title = `Insertar icono: ${icon}`;
-        iconElement.onclick = () => insertIcon(icon);
+        iconElement.onclick = () => {
+            console.log(`🎯 Click en icono: ${icon} (índice: ${index})`);
+            insertIcon(icon);
+        };
         iconGrid.appendChild(iconElement);
     });
+    
+    console.log(`✅ ${icons.length} iconos renderizados correctamente`);
 }
 
 // Función para insertar un icono en el editor
 function insertIcon(icon) {
+    console.log(`📝 Insertando icono: ${icon}`);
+    
     const editor = document.getElementById('contenido_mensaje');
+    if (!editor) {
+        console.error('❌ No se encontró el editor para insertar el icono');
+        return;
+    }
     
     // Restaurar la posición del cursor guardada
     if (savedRange) {
+        console.log('🎯 Restaurando posición del cursor guardada');
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(savedRange);
         
         // Insertar el icono en la posición restaurada
         document.execCommand('insertText', false, icon);
+        console.log('✅ Icono insertado en posición guardada');
         
         // Limpiar la referencia guardada
         savedRange = null;
     } else {
+        console.log('🎯 Usando fallback: insertando al final del editor');
         // Fallback: enfocar el editor e insertar al final
         editor.focus();
         const selection = window.getSelection();
@@ -1239,6 +1307,7 @@ function insertIcon(icon) {
         selection.addRange(range);
         
         document.execCommand('insertText', false, icon);
+        console.log('✅ Icono insertado al final del editor');
     }
     
     // Actualizar el textarea oculto
@@ -1252,6 +1321,8 @@ function insertIcon(icon) {
     
     // Mantener el foco en el editor
     editor.focus();
+    
+    console.log('🎉 Proceso de inserción completado exitosamente');
 }
 
 // Función para filtrar iconos por búsqueda
@@ -1272,35 +1343,99 @@ function filterIcons() {
         iconsToFilter = iconCollection[currentIconCategory] || [];
     }
     
-    // Filtrar iconos - por ahora solo filtramos por el código Unicode básico
-    // En una implementación más avanzada se podría tener un mapeo de nombres
-    const filteredIcons = iconsToFilter.filter(icon => {
-        // Simple filtro por posición en el array (búsqueda básica)
-        return true; // Mostrar todos por ahora, se puede mejorar
+    // Por simplicidad, mostrar todos los iconos de la categoría
+    // (la búsqueda por texto es compleja con emojis)
+    renderIcons(iconsToFilter);
+}
+
+// Función de debug para probar el selector de iconos
+window.debugIconPicker = function() {
+    console.log('🔧 INICIANDO DEBUG DEL SELECTOR DE ICONOS');
+    console.log('==========================================');
+    
+    // Verificar elementos
+    const elements = {
+        modal: document.getElementById('iconPickerModal'),
+        iconGrid: document.getElementById('iconGrid'),
+        iconSearch: document.getElementById('iconSearch'),
+        editor: document.getElementById('contenido_mensaje'),
+        iconButton: document.querySelector('button[onclick="openIconPicker()"]')
+    };
+    
+    console.log('📋 Estado de los elementos:');
+    Object.entries(elements).forEach(([name, element]) => {
+        console.log(`  ${name}:`, element ? '✅ OK' : '❌ NO ENCONTRADO');
     });
     
-    renderIcons(filteredIcons);
-}
+    // Verificar variables globales
+    console.log('📊 Variables globales:');
+    console.log(`  allIcons: ${allIcons ? allIcons.length : 'No definido'} iconos`);
+    console.log(`  iconCollection: ${iconCollection ? Object.keys(iconCollection).length : 'No definido'} categorías`);
+    console.log(`  currentIconCategory: ${currentIconCategory || 'No definido'}`);
+    console.log(`  savedRange: ${savedRange ? 'Guardado' : 'No guardado'}`);
+    
+    // Probar abrir el modal
+    console.log('🧪 Probando abrir el selector...');
+    try {
+        openIconPicker();
+        console.log('✅ Selector abierto exitosamente');
+    } catch (error) {
+        console.error('❌ Error al abrir el selector:', error);
+    }
+    
+    console.log('==========================================');
+};
 
 // Inicializar la colección de iconos cuando se cargue la página
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inicializando sistema de iconos...');
+    
+    // Verificar elementos críticos
+    const modal = document.getElementById('iconPickerModal');
+    const iconGrid = document.getElementById('iconGrid');
+    const iconButton = document.querySelector('button[onclick="openIconPicker()"]');
+    
+    console.log('🔍 Verificando elementos del DOM...');
+    console.log('Modal:', modal ? '✅ Encontrado' : '❌ No encontrado');
+    console.log('IconGrid:', iconGrid ? '✅ Encontrado' : '❌ No encontrado');
+    console.log('Botón de iconos:', iconButton ? '✅ Encontrado' : '❌ No encontrado');
+    
+    if (!modal || !iconGrid || !iconButton) {
+        console.error('❌ Faltan elementos críticos para el selector de iconos');
+    } else {
+        console.log('✅ Todos los elementos del selector de iconos encontrados');
+    }
+    
+    // Inicializar colección de iconos
     initializeIconCollection();
+    console.log(`📦 Colección de iconos inicializada: ${allIcons.length} iconos totales`);
+    
+    // Verificar categorías
+    Object.keys(iconCollection).forEach(category => {
+        console.log(`📂 Categoría '${category}': ${iconCollection[category].length} iconos`);
+    });
     
     // Cerrar modal con ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             const modal = document.getElementById('iconPickerModal');
-            if (modal.classList.contains('active')) {
+            if (modal && modal.classList.contains('active')) {
+                console.log('⌨️ Cerrando modal con tecla ESC');
                 closeIconPicker();
             }
         }
     });
     
     // Cerrar modal haciendo clic fuera del contenido
-    document.getElementById('iconPickerModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeIconPicker();
-        }
-    });
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                console.log('🖱️ Cerrando modal con clic fuera');
+                closeIconPicker();
+            }
+        });
+    }
+    
+    console.log('🎉 Sistema de iconos inicializado correctamente');
 });
 
