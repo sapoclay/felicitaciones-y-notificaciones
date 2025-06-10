@@ -1,4 +1,4 @@
-# 📧 Sistema de envío de correos masivos
+# 📧 Sistema de envío de correos masivos 📧 
 
 Este programa es un sistema para envío masivo de correos electrónicos con imágenes HTML incrustadas, que ha sido desarrollado en PHP con arquitectura MVC.
 
