@@ -69,11 +69,11 @@ foreach ($headers as $cell => $header) {
 $data = [
     [
         'EMP003', 'Barreiro Algomás Javier', 'Cangas (y alrededores)', 'Plaza del Sol Ecillo 7', 'X1234567Y',
-        'Valencia', 'Valencia', '46001', 'España', '963789012', '963789013', 'siyofueramuyrico@gmail.com', '684551555', '06-06-1980', 'Peluquería'
+        'Valencia', 'Valencia', '46001', 'España', '963789012', '963789013', 'lolailo@gmail.com', '684551555', '06-06-1980', 'Peluquería'
     ],
     [
         'EMP001', 'Pruebando Ando María José', 'TecnoChunda', 'Calle Más Mayor 123', 'B12345678',
-        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'siyofuerarico@msn.com', '684551555','06-06-2024', 'Peluquería, Estética, Masajes'
+        'Madrid', 'Madrid', '28001', 'España', '912345678', '912345679', 'chorimullo@msn.com', '684551555','06-06-2024', 'Peluquería, Estética, Masajes'
     ],
     [
         'EMP002', 'Trocipurcio Rostinguelrs Mario Jacinto', 'DistRápida', 'Arvenida Primogénica 45', 'A87654321',
