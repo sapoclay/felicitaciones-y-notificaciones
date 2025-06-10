@@ -64,13 +64,32 @@ Este programa es un sistema para envío masivo de correos electrónicos con imá
 ## 📁 Estructura
 
 ```
-├── index.php              # Punto de entrada
-├── process.php            # Controlador principal
-├── config.json            # Configuración SMTP
-├── includes/functions.php # Lógica de negocio
-├── views/main.php         # Interfaz usuario
-├── assets/js/main.js      # JavaScript frontend
-└── utils/generar_excel.php # Generador Excel de ejemplo
+├── index.php                    # Punto de entrada principal
+├── process.php                  # Controlador de envío de correos
+├── cargar_excel.php            # Procesador de archivos Excel
+├── config.json                 # Configuración SMTP
+├── composer.json               # Dependencias de Composer
+├── composer.lock               # Versiones exactas instaladas
+├── clientes_10-06-2025.xlsx    # Archivo Excel de ejemplo
+├── styles.css                  # Estilos CSS principales
+├── includes/
+│   └── functions.php           # Lógica de negocio y funciones PHP
+├── views/
+│   └── main.php               # Interfaz de usuario principal
+├── assets/
+│   └── js/
+│       └── main.js            # JavaScript frontend y selector de iconos
+├── utils/
+│   ├── generar_excel.php      # Generador de Excel de ejemplo
+│   └── README.md              # Documentación de utilidades
+└── vendor/                    # Dependencias de Composer (autoload)
+    ├── autoload.php           # Autoloader principal
+    ├── phpmailer/phpmailer/   # Librería PHPMailer para SMTP
+    ├── phpoffice/phpspreadsheet/ # Librería para manejo de Excel
+    ├── composer/              # Archivos internos de Composer
+    ├── markbaker/             # Dependencias matemáticas (Complex, Matrix)
+    ├── maennchen/zipstream-php/ # Compresión ZIP para Excel
+    └── psr/                   # Estándares PSR (HTTP, Cache)
 ```
 
 ## 📊 Formato Excel Requerido
