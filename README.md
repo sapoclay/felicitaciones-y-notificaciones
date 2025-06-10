@@ -23,6 +23,7 @@ Sistema profesional para envío masivo de correos electrónicos con imágenes HT
 - **✅ Corrección crítica completada**: Resuelto completamente el problema de contenido perdido cuando el mensaje contenía imágenes del editor. La nueva implementación con sistema de placeholders únicos garantiza la conservación total del contenido
 - **✅ Redimensionado fiel de imágenes**: Las imágenes del editor mantienen el tamaño (width/height) definido por el usuario en el email final, además de la alineación
 - **🪲 Bugfix**: Corregido un error donde el redimensionado se perdía si la imagen tenía alineación personalizada (right/left/center)
+![iconos](https://github.com/user-attachments/assets/1445fd42-2e9c-4943-8f38-1d6e2c7ba3ae)
 - **🆕 Selector de iconos/emojis**: Nueva funcionalidad que permite insertar iconos y emojis directamente en el editor de texto con una ventana modal intuitiva y categorías organizadas
 
 ## 🛠️ Tecnologías
