@@ -1,6 +1,8 @@
 # 📧 Sistema de envío de correos masivos
 
-Sistema profesional para envío masivo de correos electrónicos con imágenes HTML incrustadas, desarrollado en PHP con arquitectura MVC.
+Este programa es un sistema para envío masivo de correos electrónicos con imágenes HTML incrustadas, que ha sido desarrollado en PHP con arquitectura MVC.
+
+![web-envia-felicitaciones-promociones](https://github.com/user-attachments/assets/6cec2c18-b4fe-4a31-a6b5-4667bcefbaf2)
 
 ## 🎯 Características principales
 
@@ -19,12 +21,12 @@ Sistema profesional para envío masivo de correos electrónicos con imágenes HT
 - **✅ Prevención de reenvíos (PRG)**: Implementación del patrón Post-Redirect-Get para evitar el reenvío accidental de formularios al recargar la página
 - **✅ Corrección PHP 8+**: Resolución de advertencias de deprecación relacionadas con valores nulos en expresiones regulares
 - **🆕 Restricciones de tamaño optimizadas**: Límite máximo de 2MB por imagen para compatibilidad con servidores en la nube, con validaciones tanto en cliente como servidor
-- **🆕 Sistema unificado de imágenes**: Las imágenes del editor ahora se comportan exactamente igual que las adjuntas (embebidas con CID), manteniendo la alineación configurada
+- **🆕 Sistema unificado de imágenes**: Las imágenes del editor ahora se comportan exactamente igual que las adjuntas (embebidas con CID), manteniendo la alineación configurada por el usuario
 - **✅ Corrección crítica completada**: Resuelto completamente el problema de contenido perdido cuando el mensaje contenía imágenes del editor. La nueva implementación con sistema de placeholders únicos garantiza la conservación total del contenido
 - **✅ Redimensionado fiel de imágenes**: Las imágenes del editor mantienen el tamaño (width/height) definido por el usuario en el email final, además de la alineación
 - **🪲 Bugfix**: Corregido un error donde el redimensionado se perdía si la imagen tenía alineación personalizada (right/left/center)
-![iconos](https://github.com/user-attachments/assets/1445fd42-2e9c-4943-8f38-1d6e2c7ba3ae)
 - **🆕 Selector de iconos/emojis**: Nueva funcionalidad que permite insertar iconos y emojis directamente en el editor de texto con una ventana modal intuitiva y categorías organizadas
+![email-enviado](https://github.com/user-attachments/assets/bc1fac52-b872-4ea8-8190-0e1fa98bbb53)
 
 ## 🛠️ Tecnologías
 
@@ -42,18 +44,13 @@ Sistema profesional para envío masivo de correos electrónicos con imágenes HT
    - Soporte completo para Outlook con comentarios condicionales MSO
    - Alineación izquierda, centro y derecha funcional en todos los clientes
 
-2. **✅ Eliminación completa del modo debug**
-   - Removidas funciones `activarModoPruebaAlineacion()` y `generarAlternativasAlineacion()`
-   - Limpiados todos los logs de debug activos y comentados
-   - Sistema de producción limpio y optimizado
-
-3. **✅ Selector de iconos/emojis completo**
+2. **✅ Selector de iconos/emojis completo**
    - Modal responsive con más de 250 iconos en 4 categorías
    - Navegación intuitiva con pestañas y búsqueda
    - Integración perfecta en el editor WYSIWYG
    - Botón 😀 añadido a la barra de herramientas
 
-4. **✅ Cambio de nomenclatura Excel**
+3. **✅ Cambio de nomenclatura Excel**
    - Actualizado de `empresas_DD-MM-YYYY.xlsx` a `clientes_DD-MM-YYYY.xlsx`
    - Archivo de ejemplo renombrado: `clientes_10-06-2025.xlsx`
    - Todas las referencias en código y documentación actualizadas
@@ -157,7 +154,7 @@ El sistema ahora incluye restricciones de 2MB por imagen para garantizar compati
 - **Mensajes informativos**: La interfaz informa claramente sobre las restricciones de tamaño
 
 ## 😀 Selector de Iconos/Emojis
-
+![iconos](https://github.com/user-attachments/assets/1445fd42-2e9c-4943-8f38-1d6e2c7ba3ae)
 Nueva funcionalidad integrada en el editor de texto que permite insertar iconos y emojis de manera sencilla e intuitiva:
 
 ### 🎯 Características del Selector
@@ -179,13 +176,6 @@ Nueva funcionalidad integrada en el editor de texto que permite insertar iconos 
 3. **Buscar**: Usa el campo de búsqueda para filtrar iconos (próximamente)
 4. **Insertar**: Haz clic en cualquier icono para insertarlo en el texto
 5. **Cerrar**: ESC, clic fuera del modal o botón X
-
-### ✨ Ventajas
-- **Compatibilidad universal**: Los iconos se muestran correctamente en todos los clientes de correo
-- **Navegación intuitiva**: Interfaz fácil de usar con categorías claras
-- **Responsive**: Se adapta perfectamente a dispositivos móviles
-- **Accesibilidad**: Tooltips informativos y navegación por teclado
-- **Integración perfecta**: Los iconos se incluyen directamente en el contenido HTML del correo
 
 ## 🔧 Configuración SMTP
 
