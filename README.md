@@ -1,6 +1,6 @@
 # 📧 Sistema de envío de correos masivos 📧 
 
-Este programa es un sistema para envío masivo de correos electrónicos con imágenes HTML incrustadas, que ha sido desarrollado en PHP con arquitectura MVC.
+Este programa es un sistema para envío masivo de correos electrónicos con imágenes HTML incrustadas, que ha sido desarrollado en PHP utilizando [Composer](https://getcomposer.org/) y con arquitectura MVC.
 
 ![web-envia-felicitaciones-promociones](https://github.com/user-attachments/assets/6cec2c18-b4fe-4a31-a6b5-4667bcefbaf2)
 
