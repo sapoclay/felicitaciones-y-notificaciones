@@ -47,7 +47,7 @@ try {
     }
 
     // Copiar el archivo a la ubicación final
-    $targetPath = __DIR__ . '/empresas_' . date('d-m-Y') . '.xlsx';
+    $targetPath = __DIR__ . '/clientes_' . date('d-m-Y') . '.xlsx';
     if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
         throw new Exception('No se pudo guardar el archivo en el servidor. Verifique permisos de escritura.');
     }

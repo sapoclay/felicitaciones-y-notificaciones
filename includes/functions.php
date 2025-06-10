@@ -27,15 +27,15 @@ function loadConfig() {
 }
 
 /**
- * Obtener los correos de las empresas que tengan email válido
+ * Obtener los correos de los clientes que tengan email válido
  */
 function obtenerCorreosPorFecha() {
     // Primero intentar con la fecha de hoy
-    $inputFileName = __DIR__ . '/../empresas_' . date('d-m-Y') . '.xlsx';
+    $inputFileName = __DIR__ . '/../clientes_' . date('d-m-Y') . '.xlsx';
     
     // Si no existe, buscar el archivo Excel más reciente
     if (!file_exists($inputFileName)) {
-        $pattern = __DIR__ . '/../empresas_*.xlsx';
+        $pattern = __DIR__ . '/../clientes_*.xlsx';
         $files = glob($pattern);
         
         if (empty($files)) {

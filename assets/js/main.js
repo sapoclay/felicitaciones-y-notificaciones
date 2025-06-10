@@ -396,7 +396,7 @@ function handleFileSelect(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                mostrarNotificacion('Datos cargados correctamente. El archivo usado es empresas_' + new Date().toLocaleDateString('es-ES').replace(/\//g, '-') + '.xlsx', 'exito');
+                mostrarNotificacion('Datos cargados correctamente. El archivo usado es clientes_' + new Date().toLocaleDateString('es-ES').replace(/\//g, '-') + '.xlsx', 'exito');
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
@@ -1052,4 +1052,255 @@ function initializeEmailForm() {
         };
     }
 }
+
+/**
+ * Funciones para el selector de iconos
+ */
+
+// Colección de iconos organizados por categorías
+const iconCollection = {
+    emotions: [
+        '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+        '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+        '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥳',
+        '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖',
+        '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯',
+        '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔',
+        '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦',
+        '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴',
+        '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠'
+    ],
+    objects: [
+        '📱', '💻', '🖥️', '⌨️', '🖱️', '🖨️', '📷', '📹', '🎥', '📞',
+        '☎️', '📠', '📺', '📻', '🎵', '🎶', '🎤', '🎧', '📢', '📣',
+        '📯', '🔔', '🔕', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻',
+        '🎮', '🕹️', '🎯', '🎲', '🎰', '🎳', '⚽', '🏀', '🏈', '⚾',
+        '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒',
+        '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿',
+        '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂'
+    ],
+    symbols: [
+        '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔',
+        '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️',
+        '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐',
+        '⭐', '🌟', '💫', '⚡', '💥', '💢', '💨', '💦', '💤', '💨',
+        '🔥', '🌈', '☀️', '🌤️', '⛅', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️',
+        '❄️', '☃️', '⛄', '🌬️', '💨', '🌪️', '🌫️', '🌊', '💧', '☔',
+        '✨', '⭐', '🌟', '💫', '✅', '❌', '❎', '✔️', '☑️', '❓',
+        '❔', '❕', '❗', '‼️', '⁉️', '💯', '🔀', '🔁', '🔂', '▶️',
+        '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '⏫', '🔽', '⏬'
+    ],
+    nature: [
+        '🌱', '🌿', '🍀', '🌾', '🌵', '🌲', '🌳', '🌴', '🌊', '🌍',
+        '🌎', '🌏', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘',
+        '🌙', '🌚', '🌛', '🌜', '🌝', '☀️', '🌞', '⭐', '🌟', '💫',
+        '🌠', '☁️', '⛅', '⛈️', '🌤️', '🌦️', '🌧️', '🌩️', '🌨️', '❄️',
+        '☃️', '⛄', '🌬️', '💨', '🌪️', '🌫️', '🌈', '☔', '💧', '💦',
+        '🌊', '🔥', '✨', '🌺', '🌸', '🌼', '🌻', '🌷', '🌹', '🥀',
+        '🌮', '🌯', '🌰', '🌱', '🌲', '🌳', '🌴', '🌵', '🌶️', '🌽',
+        '🍄', '🍅', '🍆', '🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍'
+    ]
+};
+
+let currentIconCategory = 'all';
+let allIcons = [];
+let savedRange = null; // Variable para guardar la posición del cursor
+
+// Función para inicializar la colección completa de iconos
+function initializeIconCollection() {
+    allIcons = [];
+    Object.values(iconCollection).forEach(categoryIcons => {
+        allIcons = allIcons.concat(categoryIcons);
+    });
+}
+
+// Función para abrir el selector de iconos
+function openIconPicker() {
+    const editor = document.getElementById('contenido_mensaje');
+    
+    // Guardar la posición actual del cursor
+    if (editor.contains(document.activeElement) || editor === document.activeElement) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            savedRange = selection.getRangeAt(0).cloneRange();
+        }
+    } else {
+        // Si el editor no tiene foco, enfocarlo y colocar el cursor al final
+        editor.focus();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false); // Colocar al final
+        selection.removeAllRanges();
+        selection.addRange(range);
+        savedRange = range.cloneRange();
+    }
+    
+    if (allIcons.length === 0) {
+        initializeIconCollection();
+    }
+    
+    const modal = document.getElementById('iconPickerModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Mostrar todos los iconos por defecto
+    showIconCategory('all');
+    
+    // Enfocar el campo de búsqueda
+    setTimeout(() => {
+        document.getElementById('iconSearch').focus();
+    }, 100);
+}
+
+// Función para cerrar el selector de iconos
+function closeIconPicker() {
+    const modal = document.getElementById('iconPickerModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    
+    // Limpiar búsqueda
+    document.getElementById('iconSearch').value = '';
+    
+    // Volver a mostrar todos los iconos
+    showIconCategory('all');
+    
+    // Restaurar el foco al editor si había una posición guardada
+    if (savedRange) {
+        const editor = document.getElementById('contenido_mensaje');
+        editor.focus();
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+        savedRange = null; // Limpiar la referencia
+    }
+}
+
+// Función para mostrar iconos por categoría
+function showIconCategory(category) {
+    currentIconCategory = category;
+    
+    // Actualizar botones de categoría
+    document.querySelectorAll('.icon-category').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[onclick="showIconCategory('${category}')"]`).classList.add('active');
+    
+    // Obtener iconos de la categoría
+    let iconsToShow = [];
+    if (category === 'all') {
+        iconsToShow = allIcons;
+    } else {
+        iconsToShow = iconCollection[category] || [];
+    }
+    
+    // Renderizar iconos
+    renderIcons(iconsToShow);
+}
+
+// Función para renderizar iconos en la cuadrícula
+function renderIcons(icons) {
+    const iconGrid = document.getElementById('iconGrid');
+    iconGrid.innerHTML = '';
+    
+    icons.forEach(icon => {
+        const iconElement = document.createElement('div');
+        iconElement.className = 'icon-item';
+        iconElement.textContent = icon;
+        iconElement.title = `Insertar icono: ${icon}`;
+        iconElement.onclick = () => insertIcon(icon);
+        iconGrid.appendChild(iconElement);
+    });
+}
+
+// Función para insertar un icono en el editor
+function insertIcon(icon) {
+    const editor = document.getElementById('contenido_mensaje');
+    
+    // Restaurar la posición del cursor guardada
+    if (savedRange) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+        
+        // Insertar el icono en la posición restaurada
+        document.execCommand('insertText', false, icon);
+        
+        // Limpiar la referencia guardada
+        savedRange = null;
+    } else {
+        // Fallback: enfocar el editor e insertar al final
+        editor.focus();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        document.execCommand('insertText', false, icon);
+    }
+    
+    // Actualizar el textarea oculto
+    updateHiddenTextarea();
+    
+    // Cerrar el selector de iconos
+    closeIconPicker();
+    
+    // Mostrar notificación
+    mostrarNotificacion(`Icono ${icon} insertado correctamente`, 'exito', 2000);
+    
+    // Mantener el foco en el editor
+    editor.focus();
+}
+
+// Función para filtrar iconos por búsqueda
+function filterIcons() {
+    const searchTerm = document.getElementById('iconSearch').value.toLowerCase();
+    
+    if (searchTerm === '') {
+        // Si no hay término de búsqueda, mostrar la categoría actual
+        showIconCategory(currentIconCategory);
+        return;
+    }
+    
+    // Obtener iconos de la categoría actual o todos si es 'all'
+    let iconsToFilter = [];
+    if (currentIconCategory === 'all') {
+        iconsToFilter = allIcons;
+    } else {
+        iconsToFilter = iconCollection[currentIconCategory] || [];
+    }
+    
+    // Filtrar iconos - por ahora solo filtramos por el código Unicode básico
+    // En una implementación más avanzada se podría tener un mapeo de nombres
+    const filteredIcons = iconsToFilter.filter(icon => {
+        // Simple filtro por posición en el array (búsqueda básica)
+        return true; // Mostrar todos por ahora, se puede mejorar
+    });
+    
+    renderIcons(filteredIcons);
+}
+
+// Inicializar la colección de iconos cuando se cargue la página
+document.addEventListener('DOMContentLoaded', function() {
+    initializeIconCollection();
+    
+    // Cerrar modal con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('iconPickerModal');
+            if (modal.classList.contains('active')) {
+                closeIconPicker();
+            }
+        }
+    });
+    
+    // Cerrar modal haciendo clic fuera del contenido
+    document.getElementById('iconPickerModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeIconPicker();
+        }
+    });
+});
 

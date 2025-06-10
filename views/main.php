@@ -150,6 +150,7 @@
                             <button type="button" onclick="insertLink()" data-tooltip="Enlace">🔗</button>
                             <button type="button" onclick="insertHorizontalRule()" data-tooltip="Línea">📏</button>
                             <button type="button" onclick="insertImage()" data-tooltip="Imagen (máx 2MB)">🖼️</button>
+                            <button type="button" onclick="openIconPicker()" data-tooltip="Insertar icono">😀</button>
                         </div>
                         <div class="toolbar-group">
                             <select onchange="changeFontSize(this.value)" data-tooltip="Tamaño de fuente">
@@ -205,6 +206,31 @@
     <footer class="copyright">
         <p>&copy; <?php echo date('Y'); ?> Sistema de Envío de Correos. Creado por Javier, Michel y <a href="https://entreunosyceros.net" target="_blank" title="About entreunosyceros">entreunosyceros</a></p>
     </footer>
+
+    <!-- Modal para selección de iconos -->
+    <div id="iconPickerModal" class="icon-modal">
+        <div class="icon-modal-content">
+            <div class="icon-modal-header">
+                <h3>Seleccionar Icono</h3>
+                <button type="button" class="icon-modal-close" onclick="closeIconPicker()">&times;</button>
+            </div>
+            <div class="icon-modal-body">
+                <div class="icon-search">
+                    <input type="text" id="iconSearch" placeholder="Buscar icono..." onkeyup="filterIcons()">
+                </div>
+                <div class="icon-categories">
+                    <button type="button" class="icon-category active" onclick="showIconCategory('all')">Todos</button>
+                    <button type="button" class="icon-category" onclick="showIconCategory('emotions')">Emociones</button>
+                    <button type="button" class="icon-category" onclick="showIconCategory('objects')">Objetos</button>
+                    <button type="button" class="icon-category" onclick="showIconCategory('symbols')">Símbolos</button>
+                    <button type="button" class="icon-category" onclick="showIconCategory('nature')">Naturaleza</button>
+                </div>
+                <div class="icon-grid" id="iconGrid">
+                    <!-- Los iconos se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="assets/js/main.js"></script>
 </body>

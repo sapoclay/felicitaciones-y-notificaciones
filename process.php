@@ -32,16 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject = $_POST['asunto'] ?? '';
     $message = $_POST['mensaje'] ?? '';
     
-    // LOGGING TEMPORAL PARA DEBUG - INICIO
-    // error_log("=== DEBUG PROCESS.PHP ===");
-    // error_log("Message length: " . strlen($message));
-    // error_log("Message content: " . $message);
-    // error_log("Number of images in message: " . preg_match_all('/<img[^>]*>/i', $message, $matches));
-    // $parts = preg_split('/<img[^>]*>/i', $message);
-    // error_log("Parts after splitting by images: " . print_r($parts, true));
-    // error_log("========================");
-    // LOGGING TEMPORAL PARA DEBUG - FIN
-    
     // Validar campos requeridos
     if (empty($to) || empty($subject) || empty($message)) {
         $_SESSION['mensaje'] = 'Por favor, complete todos los campos requeridos.';
@@ -109,9 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 $mail->Body = $mensajeFinal;
-                
-                // DEBUG: Log del HTML final que se envía
-                error_log("DEBUG: HTML FINAL ENVIADO: " . $mensajeFinal);
                 
                 $mail->send();
                 $enviados++;
