@@ -41,6 +41,8 @@ Este programa lo he probado en un servidor local y en en servidor web sin ningú
    cd sistema-correos-entreunosyceros
    composer install
    ```
+En Windows habrá que instalar composer descargandolo [desde su sitio web](https://getcomposer.org/download/)
+
 3. **Configura el servidor web**
    - Puedes usar Apache, Nginx o el servidor de desarrollo incluido:
    ```bash
