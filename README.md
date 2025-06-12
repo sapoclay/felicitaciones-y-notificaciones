@@ -47,6 +47,7 @@ Este programa lo he probado en un servidor local y en en servidor web sin ningú
    php -S localhost:8080
    ```
 4. **Accede al sistema**
+![login](https://github.com/user-attachments/assets/74bb1240-0c34-4b78-886c-bed16bdaea16)
    - Usuario por defecto: `entreunosyceros`
    - Contraseña por defecto: `entreunosyceros`
 
