@@ -17,7 +17,7 @@ body {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px;
-    background-color: var(--bg-color);
+    background-color: #fff;
     color: var(--text-color);
     line-height: 1.6;
 }
@@ -28,6 +28,26 @@ h1 {
     margin-bottom: 2rem;
     font-weight: 300;
     font-size: 2.5rem;
+}
+
+.main-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.main-logo {
+    max-width: 150px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    display: block;
+    margin: 0 auto;
 }
 
 .form-group {
@@ -278,6 +298,41 @@ input[type="submit"]:active {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Estilos específicos para alineación de imágenes - Mayor compatibilidad con correos */
+.image-container.align-left {
+    text-align: left !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+.image-container.align-left img {
+    display: block !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+.image-container.align-center {
+    text-align: center !important;
+    margin: 10px auto !important;
+}
+
+.image-container.align-center img {
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+.image-container.align-right {
+    text-align: right !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+.image-container.align-right img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
 }
 
 .imagen-container:hover {
@@ -1163,17 +1218,39 @@ body.sidebar-open {
     text-align: inherit;
 }
 
-.image-container img {
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    display: inline-block;
-    max-width: 100%;
-    height: auto;
+/* Estilos específicos para alineación de imágenes - Mayor compatibilidad con correos */
+.image-container.align-left {
+    text-align: left !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
 }
 
-.image-container img:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+.image-container.align-left img {
+    display: block !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+.image-container.align-center {
+    text-align: center !important;
+    margin: 10px auto !important;
+}
+
+.image-container.align-center img {
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+.image-container.align-right {
+    text-align: right !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+.image-container.align-right img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
 }
 
 .image-controls {

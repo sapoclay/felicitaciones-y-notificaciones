@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - envío de correos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .doc-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .feature-card h3 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+        
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .example-table th,
+        .example-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .example-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .example-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .compatibility-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .compatible {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .partial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .not-compatible {
+            background: #fecaca;
+            color: #991b1b;
+        }
+        
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+        
+        .alert-success {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+            color: #166534;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="doc-container">
+        <header style="text-align: center; margin-bottom: 40px;">
+            <h1>🚀 Sistema de Correos entreunosyceros - Estructura Excel y otras cosas a tener en cuenta</h1>
+            <p style="font-size: 1.2em; color: #6b7280;">Documentación del sistema actualizado</p>
+        </header>
+
+        <div class="alert alert-success">
+            <strong>🎉 Sistema Completamente Actualizado (Junio 2025):</strong> El sistema ha sido actualizado para manejar archivos Excel con estructura completamente flexible. Ahora funciona con cualquier orden de columnas especificadas: Código, Nombre, Nombre comercial, Dirección, C.I.F., Localidad, Provincia, C.Postal, País, Teléfono, FAX, Email, Contacto, F. Alta, Tratamientos. <strong>Solo el Nombre es obligatorio</strong> - todas las demás columnas son completamente opcionales y pueden estar en cualquier posición.
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>🔧 Nueva Funcionalidad Flexible:</strong> Se implementó detección automática de columnas que permite archivos con cualquier estructura. El sistema busca inteligentemente cada columna sin importar el orden. Compatible con archivos desde la estructura mínima (solo Nombre) hasta archivos complejos con todas las columnas.</div>
+
+        <section>
+            <h2>📋 Descripción General</h2>
+            <p>El sistema de correos entreunosyceros ha sido completamente actualizado para trabajar con archivos Excel de cualquier tamaño y estructura. Detecta automáticamente las columnas específicas: <strong>Código, Nombre, Nombre comercial, Dirección, C.I.F., Localidad, Provincia, C.Postal, País, Teléfono, FAX, Email, Contacto, F. Alta, Tratamientos</strong>.</p>
+            
+            <div class="alert alert-warning">
+                <strong>⚡ Cambio Importante:</strong> El email ya no es obligatorio. Si el archivo contiene columna de email, solo se mostrarán registros con email válido. Si no hay columna de email, se mostrarán todos los registros con nombres válidos para consulta (sin capacidad de envío de correos).
+            </div>
+        </section>
+
+        <section>
+            <h2>🔍 Detección Automática de Columnas</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>✅ Columna Requerida (Mínima)</h3>
+                    <p><strong>Nombre:</strong> nombre, nombres</p>
+                    <div class="alert alert-info" style="margin-top: 10px; padding: 10px; font-size: 0.9em;">
+                        <strong>Solo se requiere el nombre.</strong> El email es opcional desde la última actualización.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📧 Email (Opcional pero Recomendado)</h3>
+                    <p><strong>Email:</strong> email, e-mail, correo, correo electrónico, mail</p>
+                    <div class="alert alert-warning" style="margin-top: 10px; padding: 10px; font-size: 0.9em;">
+                        <strong>Si no hay email:</strong> Solo se pueden consultar los datos, no enviar correos.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>⚙️ Columnas específicas detectadas</h3>
+                    <p><strong>Código:</strong> código, cod</p>
+                    <p><strong>Nombre Comercial:</strong> nombre comercial</p>
+                    <p><strong>Dirección:</strong> dirección</p>
+                    <p><strong>C.I.F.:</strong> cif, c.i.f., nif</p>
+                    <p><strong>Localidad:</strong> localidad, ciudad, municipio</p>
+                    <p><strong>Provincia:</strong> provincia</p>
+                    <p><strong>Código Postal:</strong> c.postal, codigo postal, cp</p>
+                    <p><strong>País:</strong> país, pais, country</p>
+                    <p><strong>Teléfono:</strong> teléfono, telefono, phone</p>
+                    <p><strong>FAX:</strong> fax</p>
+                    <p><strong>Contacto:</strong> contacto, persona contacto</p>
+                    <p><strong>Fecha Alta:</strong> f. alta, fecha alta, fecha de alta</p>
+                    <p><strong>Tratamientos:</strong> tratamientos, tratamiento, servicios</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🚀 Mejoras técnicas recientes</h3>
+                    <ul>
+                        <li>✅ <strong>Archivos grandes:</strong> Soporte para 59+ columnas (más allá de Z)</li>
+                        <li>✅ <strong>Detección robusta:</strong> Email detectado correctamente en cualquier posición</li>
+                        <li>✅ <strong>Compatibilidad:</strong> Windows emulado en Mac</li>
+                        <li>✅ <strong>Flexibilidad:</strong> Email opcional, solo nombre requerido</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>📊 Estructura completa (Recomendada)</h2>
+                        
+            <table class="example-table">
+                <tr>
+                    <th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th><th>J</th><th>K</th><th>L</th><th>M</th><th>N</th><th>O</th><th>...</th><th>BG</th>
+                </tr>
+                <tr>
+                    <td>Código</td><td>Nombre</td><td>Nombre comercial</td><td>Dirección</td><td>C.I.F.</td><td>Localidad</td><td>Provincia</td><td>C.Postal</td><td>País</td><td>Teléfono</td><td>FAX</td><td>Email</td><td>Contacto</td><td>F. Alta</td><td>Tratamientos</td><td>...</td><td>Otras</td>
+                </tr>
+                <tr>
+                    <td colspan="17"><span class="compatibility-badge compatible">✅ Totalmente compatible (Cualquier número de columnas)</span></td>
+                </tr>
+            </table>
+
+            <h3>Estructura mínima (solo el nombre)</h3>
+            <table class="example-table">
+                <tr>
+                    <th>Columna A</th>
+                    <th>Columna B</th>
+                </tr>
+                <tr>
+                    <td>Nombre</td>
+                </tr>
+                <tr>
+                    <td><span class="compatibility-badge compatible">✅ Compatible (Solo consulta, sin envío de correos)</span></td>
+                </tr>
+            </table>
+
+            <h3>Estructura con email (recomendada para envíos)</h3>
+            <table class="example-table">
+                <tr>
+                    <th>Columna A</th>
+                    <th>Columna B</th>
+                </tr>
+                <tr>
+                    <td>Nombre</td>
+                    <td>Email</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><span class="compatibility-badge compatible">✅ Compatible (consulta + envío de correos)</span></td>
+                </tr>
+            </table>
+
+            <h3>Estructura parcial (con tratamientos)</h3>
+            <table class="example-table">
+                <tr>
+                    <th>Columna A</th>
+                    <th>Columna B</th>
+                    <th>Columna C</th>
+                    <th>Columna D</th>
+                </tr>
+                <tr>
+                    <td>Código</td>
+                    <td>Nombre</td>
+                    <td>Email</td>
+                    <td>Tratamientos</td>
+                </tr>
+                <tr>
+                    <td colspan="4"><span class="compatibility-badge compatible">✅ Compatible (con filtros)</span></td>
+                </tr>
+            </table>
+
+            <h3>Estructura no compatible (ejemplo antiguo)</h3>
+            <table class="example-table">
+                <tr>
+                    <th>Columna A</th>
+                    <th>Columna B</th>
+                    <th>Columna C</th>
+                </tr>
+                <tr>
+                    <td>Código</td>
+                    <td>Teléfono</td>
+                    <td>Dirección</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><span class="compatibility-badge not-compatible">❌ No Compatible (falta columna nombre)</span></td>
+                </tr>
+            </table>
+            
+            <div class="alert alert-info">
+                <strong>💡 Nota:</strong> Desde la última actualización, solo se requiere la columna "Nombre". Los archivos que antes eran incompatibles por falta de email ahora son compatibles para consulta.
+            </div>
+        </section>
+
+        <section>
+            <h2>🎯 Características principales</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔍 Detección automática mejorada</h3>
+                    <ul>
+                        <li>✅ Soporte para archivos con 59+ columnas (más allá de Z)</li>
+                        <li>✅ Detección correcta de Email en cualquier posición</li>
+                        <li>✅ Reconoce automáticamente las 15 columnas especificadas</li>
+                        <li>✅ Búsqueda insensible a mayúsculas/minúsculas</li>
+                        <li>✅ Adaptable a diferentes variaciones de nombres</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📋 Filtrado flexible</h3>
+                    <ul>
+                        <li>✅ <strong>Con Email:</strong> Solo registros con nombre Y email válidos</li>
+                        <li>✅ <strong>Sin Email:</strong> Todos los registros con nombres válidos</li>
+                        <li>✅ Validación automática de formato de email</li>
+                        <li>✅ Filtros por tratamientos (si existe la columna)</li>
+                        <li>⚠️ Sin email = solo consulta, no envío</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🛠️ Flexibilidad total</h3>
+                    <ul>
+                        <li>✅ Cualquier orden de las columnas especificadas</li>
+                        <li>✅ Archivos grandes (ejemplo: 59 columnas, 2,189 registros)</li>
+                        <li>✅ Columnas adicionales son ignoradas automáticamente</li>
+                        <li>✅ Email opcional desde actualización reciente</li>
+                        <li>✅ Tratamientos opcional (filtros vacíos si no existe)</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🚨 Validación robusta</h3>
+                    <ul>
+                        <li>✅ Solo requiere columna "Nombre" (email opcional)</li>
+                        <li>✅ Mensajes de error descriptivos y específicos</li>
+                        <li>✅ Reporte de compatibilidad detallado con porcentajes</li>
+                        <li>✅ Detección de problemas técnicos (columnas no encontradas)</li>
+                        <li>✅ Compatible con Windows emulado en Mac</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>🔧 Uso práctico</h2>
+            
+            <div class="alert alert-info">
+                <strong>💡 Actualizado:</strong> El sistema ahora es mucho más flexible. Solo necesita la columna "Nombre" como mínimo. El email es opcional pero imprescindible para el envío de correos.
+            </div>
+
+            <h3>Pasos para usar el sistema (actualizado):</h3>
+            <ol>
+                <li><strong>Prepara tu archivo Excel</strong> con al menos la columna "Nombre"</li>
+                <li><strong>Incluye "Email"</strong> si quieres enviar correos (recomendado)</li>
+                <li><strong>Incluye "Tratamientos"</strong> si quieres usar filtros por tratamiento (opcional)</li>
+                <li><strong>Carga el archivo</strong> usando el botón "Seleccionar archivo Excel"</li>
+                <li><strong>Revisa las columnas detectadas</strong> que aparecerán automáticamente</li>
+                <li><strong>El sistema mostrará:</strong>
+                    <ul>
+                        <li>📧 <strong>Con email:</strong> Solo registros con nombre Y email válidos</li>
+                        <li>📝 <strong>Sin email:</strong> Todos los registros con nombres válidos</li>
+                    </ul>
+                </li>
+                <li><strong>Procede según el tipo:</strong>
+                    <ul>
+                        <li>✉️ <strong>Con email:</strong> Envío de correos + consulta</li>
+                        <li>👁️ <strong>Sin email:</strong> Solo consulta de datos</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>Información mostrada al cargar:</h3>
+            <ul>
+                <li>✅ Columnas detectadas con su posición exacta (ej: Email en columna L)</li>
+                <li>📊 Total de registros encontrados y procesados</li>
+                <li>📈 Nivel de compatibilidad del archivo (ej: 93.3%)</li>
+                <li>🔧 Sugerencias específicas si hay problemas</li>
+                <li>⚠️ Advertencias si falta columna de email</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>⚠️ Resolución de problemas actualizada</h2>
+            
+            <h3>✅ Problema resuelto: archivos grandes</h3>
+            <div class="alert alert-success">
+                <strong>Solucionado:</strong> Los archivos con más de 26 columnas (más allá de Z) ahora funcionan perfectamente. Ejemplo: archivos con 59 columnas y Email en columna L se procesan correctamente.
+            </div>
+            
+            <h3>Archivo no compatible (raro)</h3>
+            <div class="alert alert-warning">
+                <strong>Problema:</strong> "El archivo no contiene las columnas requeridas"<br>
+                <strong>Solución:</strong> Ahora solo se requiere la columna "Nombre". Asegúrate de que tu Excel tenga al menos una columna llamada "Nombre" (o variaciones como "Nombres").
+            </div>
+
+            <h3>Columnas no detectadas</h3>
+            <div class="alert alert-warning">
+                <strong>Problema:</strong> El sistema no detecta una columna que sí existe<br>
+                <strong>Solución:</strong> Verifica que el nombre de la columna sea similar a los nombres reconocidos. El sistema ahora es más robusto y mostrará sugerencias detalladas.
+            </div>
+
+            <h3>✅ Login en Windows emulado (resuelto)</h3>
+            <div class="alert alert-success">
+                <strong>Problema resuelto:</strong> Problemas de login en sistemas Windows emulados en Mac<br>
+                <strong>Solución implementada:</strong> El sistema ahora es compatible. El botón mostrar/ocultar contraseña funciona correctamente.
+            </div>
+
+            <h3>Sin columna de email</h3>
+            <div class="alert alert-info">
+                <strong>Comportamiento:</strong> Si no hay columna de email en el archivo<br>
+                <strong>Resultado:</strong> El sistema funciona en modo "solo consulta" - puedes ver todos los datos pero no enviar correos. Esto es normal y esperado.
+            </div>
+        </section>
+
+        <section>
+            <h2>🔧 Correcciones técnicas implementadas</h2>
+            
+            <div class="alert alert-success">
+                <strong>🎯 Problema principal resuelto:</strong> El sistema no podía procesar archivos Excel con más de 26 columnas debido a limitaciones en el algoritmo de iteración de columnas PHP.
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🚀 Detección de columnas corregida</h3>
+                    <p><strong>Problema:</strong> Algoritmo limitado a columnas A-Z</p>
+                    <p><strong>Solución:</strong> Implementación con índices numéricos usando <code>PhpOffice\PhpSpreadsheet\Cell\Coordinate</code></p>
+                    <p><strong>Resultado:</strong> Soporte para cualquier número de columnas (A, B, C... AA, AB... BG, etc.)</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📧 Email opcional</h3>
+                    <p><strong>Cambio:</strong> De requerido a opcional</p>
+                    <p><strong>Beneficio:</strong> Archivos sin email ahora son compatibles</p>
+                    <p><strong>Comportamiento:</strong> Sin email = modo consulta, con email = modo completo</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🖥️ Compatibilidad login</h3>
+                    <p><strong>Problema:</strong> Errores en Windows emulado en Mac</p>
+                    <p><strong>Solución:</strong> JavaScript corregido, botón mostrar/ocultar funcional</p>
+                    <p><strong>Seguridad:</strong> Información sensible removida</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📊 Caso de exito</h3>
+                    <p><strong>Archivo:</strong> clientes_11-06-2025.xlsx</p>
+                    <p><strong>Especificaciones:</strong> 59 columnas, Email en columna L, 2,189 registros</p>
+                    <p><strong>Resultado:</strong> 1,366 registros procesados exitosamente</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>📁 Carga de archivos - Nombres flexibles</h2>
+            <div class="alert alert-success">
+                <strong>🎉 Nueva funcionalidad:</strong> Ahora puedes subir archivos Excel con cualquier nombre - no es necesario seguir una estructura específica de nombres.
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>✅ Nombres de archivo aceptados</h3>
+                    <ul>
+                        <li><strong>Cualquier nombre:</strong> Mi archivo.xlsx, Datos_empresa.xlsx, Base-de-datos.xlsx</li>
+                        <li><strong>Con espacios:</strong> Lista de Clientes 2024.xlsx</li>
+                        <li><strong>Con guiones:</strong> datos-empresa-2024.xlsx</li>
+                        <li><strong>Con puntos:</strong> archivo.datos.v2.xlsx</li>
+                        <li><strong>Formato anterior:</strong> clientes_11-06-2025.xlsx (sigue funcionando)</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🔄 Sistema de gestión automática</h3>
+                    <ul>
+                        <li><strong>Nombres únicos:</strong> Se agrega timestamp automático</li>
+                        <li><strong>Limpieza automática:</strong> Elimina archivos anteriores al subir uno nuevo</li>
+                        <li><strong>Preservación del nombre:</strong> Se muestra el nombre original en la interfaz</li>
+                        <li><strong>Detección automática:</strong> Usa siempre el archivo más reciente</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>Ejemplos de transformación de nombres</h3>
+            <div class="code-block">
+                <strong>Archivos que subes:</strong><br>
+                'Mis Clientes.xlsx' → 'Mis_Clientes_2025-06-11_20-59-28.xlsx'<br>
+                'Base de Datos 2024.xlsx' → 'Base_de_Datos_2024_2025-06-11_20-59-28.xlsx'<br>
+                'DATOS_EMPRESA.xlsx' → 'DATOS_EMPRESA_2025-06-11_20-59-28.xlsx'<br>
+                'archivo-con-guiones.xlsx' → 'archivo-con-guiones_2025-06-11_20-59-28.xlsx'
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>💡 Consejo:</strong> Ya no necesitas renombrar tus archivos Excel. El sistema acepta cualquier nombre y lo gestiona automáticamente manteniendo la referencia al nombre original.
+            </div>
+        </section>
+
+        <section>
+            <h2>⚙️ Configuración del sistema SMTP</h2>
+            
+            <div class="alert alert-info">
+                <strong>🔧 Importante:</strong> Antes de enviar correos masivos, debes configurar correctamente el servidor SMTP. Esta configuración solo debe hacerse una vez y se guarda automáticamente.
+            </div>
+
+            <h3>📧 Campos de configuración SMTP</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🌐 Servidor SMTP</h3>
+                    <p><strong>Campo:</strong> Servidor SMTP</p>
+                    <p><strong>Descripción:</strong> Dirección del servidor de correo saliente</p>
+                    <p><strong>Ejemplos comunes:</strong></p>
+                    <ul>
+                        <li><code>smtp.gmail.com</code> - Gmail</li>
+                        <li><code>smtp.outlook.com</code> - Outlook/Hotmail</li>
+                        <li><code>smtp.yahoo.com</code> - Yahoo</li>
+                        <li><code>mail.tu-dominio.com</code> - Servidor propio</li>
+                        <li><code>smtp.ionos.es</code> - Ionos</li>
+                        <li><code>smtp.godaddy.com</code> - GoDaddy</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>👤 Usuario SMTP</h3>
+                    <p><strong>Campo:</strong> Usuario SMTP</p>
+                    <p><strong>Descripción:</strong> Tu dirección de email completa</p>
+                    <p><strong>Formato:</strong> <code>tu-email@dominio.com</code></p>
+                    <p><strong>Ejemplos:</strong></p>
+                    <ul>
+                        <li><code>empresa@gmail.com</code></li>
+                        <li><code>marketing@tu-empresa.com</code></li>
+                        <li><code>noreply@midominio.es</code></li>
+                    </ul>
+                    <div class="alert alert-warning" style="margin-top: 10px; padding: 8px; font-size: 0.9em;">
+                        <strong>⚠️ Nota:</strong> Debe ser exactamente la misma dirección que usas para hacer login en tu correo.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📤 Email del remitente</h3>
+                    <p><strong>Campo:</strong> Email del remitente</p>
+                    <p><strong>Descripción:</strong> Dirección que aparecerá como remitente</p>
+                    <p><strong>Recomendación:</strong> Normalmente la misma que "Usuario SMTP"</p>
+                    <p><strong>Uso:</strong> Los destinatarios verán este email como quien envía</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🔑 Contraseña</h3>
+                    <p><strong>Campo:</strong> Contraseña</p>
+                    <p><strong>Descripción:</strong> Contraseña de tu cuenta de correo</p>
+                    <div class="alert alert-warning" style="margin-top: 10px; padding: 8px; font-size: 0.9em;">
+                        <strong>🔐 Seguridad Gmail/Outlook:</strong> Si usas Gmail u Outlook, necesitas generar una "contraseña de aplicación" específica, NO tu contraseña normal.
+                    </div>
+                    <p><strong>Para Gmail:</strong></p>
+                    <ol style="font-size: 0.9em;">
+                        <li>Ve a Configuración de Google → Seguridad</li>
+                        <li>Activa "Verificación en 2 pasos"</li>
+                        <li>Busca "Contraseñas de aplicaciones"</li>
+                        <li>Genera una nueva para "Correo"</li>
+                        <li>Usa esa contraseña de 16 caracteres aquí</li>
+                    </ol>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🏷️ Nombre del remitente</h3>
+                    <p><strong>Campo:</strong> Nombre del remitente</p>
+                    <p><strong>Descripción:</strong> Nombre que aparecerá junto al email</p>
+                    <p><strong>Ejemplos:</strong></p>
+                    <ul>
+                        <li><code>Empresa Ylekara</code></li>
+                        <li><code>Equipo de Marketing</code></li>
+                        <li><code>Centro de Belleza ABC</code></li>
+                        <li><code>Clínica Estética</code></li>
+                    </ul>
+                    <p><strong>Resultado:</strong> Los destinatarios verán: <code>"Empresa Ylekara" &lt;empresa@gmail.com&gt;</code></p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🔌 Puerto</h3>
+                    <p><strong>Campo:</strong> Puerto</p>
+                    <p><strong>Descripción:</strong> Puerto del servidor SMTP</p>
+                    <p><strong>Valores típicos:</strong></p>
+                    <ul>
+                        <li><code>465</code> - SSL (recomendado)</li>
+                        <li><code>587</code> - TLS</li>
+                        <li><code>25</code> - Sin cifrado (no recomendado)</li>
+                    </ul>
+                    <div class="alert alert-success" style="margin-top: 10px; padding: 8px; font-size: 0.9em;">
+                        <strong>✅ Por defecto:</strong> El sistema usa puerto 465 (SSL) que funciona con la mayoría de proveedores.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🔒 Seguridad</h3>
+                    <p><strong>Campo:</strong> Seguridad</p>
+                    <p><strong>Opciones:</strong></p>
+                    <ul>
+                        <li><strong>SSL:</strong> Más seguro, puerto 465</li>
+                        <li><strong>TLS:</strong> También seguro, puerto 587</li>
+                    </ul>
+                    <div class="alert alert-info" style="margin-top: 10px; padding: 8px; font-size: 0.9em;">
+                        <strong>💡 Recomendación:</strong> Usa SSL con puerto 465 para máxima compatibilidad.
+                    </div>
+                </div>
+            </div>
+
+            <h3>🎯 Configuraciones típicas por proveedor</h3>
+            
+            <table class="example-table">
+                <tr>
+                    <th>Proveedor</th>
+                    <th>Servidor SMTP</th>
+                    <th>Puerto</th>
+                    <th>Seguridad</th>
+                    <th>Notas</th>
+                </tr>
+                <tr>
+                    <td><strong>Gmail</strong></td>
+                    <td>smtp.gmail.com</td>
+                    <td>465</td>
+                    <td>SSL</td>
+                    <td>Requiere contraseña de aplicación</td>
+                </tr>
+                <tr>
+                    <td><strong>Outlook/Hotmail</strong></td>
+                    <td>smtp.outlook.com</td>
+                    <td>587</td>
+                    <td>TLS</td>
+                    <td>Puede requerir contraseña de aplicación</td>
+                </tr>
+                <tr>
+                    <td><strong>Yahoo</strong></td>
+                    <td>smtp.yahoo.com</td>
+                    <td>465</td>
+                    <td>SSL</td>
+                    <td>Activar "Apps menos seguras"</td>
+                </tr>
+                <tr>
+                    <td><strong>Ionos</strong></td>
+                    <td>smtp.ionos.es</td>
+                    <td>587</td>
+                    <td>TLS</td>
+                    <td>Usuario: email completo</td>
+                </tr>
+                <tr>
+                    <td><strong>cPanel/Hostinger</strong></td>
+                    <td>mail.tu-dominio.com</td>
+                    <td>465</td>
+                    <td>SSL</td>
+                    <td>Contacta con tu hosting</td>
+                </tr>
+            </table>
+
+            <h3>🔧 Pasos para configurar</h3>
+            <ol>
+                <li><strong>Abre el menú lateral:</strong> Haz clic en el botón ☰ en la esquina superior izquierda</li>
+                <li><strong>Ve a "Configuración SMTP":</strong> Verás el formulario de configuración</li>
+                <li><strong>Completa los campos:</strong> Usa los valores de tu proveedor de correo</li>
+                <li><strong>Prueba la configuración:</strong> Haz un envío de prueba a tu propio email</li>
+                <li><strong>Guarda la configuración:</strong> Haz clic en "Guardar configuración"</li>
+            </ol>
+
+            <div class="alert alert-success">
+                <strong>✅ Una vez configurado:</strong> La configuración se guarda automáticamente y no necesitarás volver a ingresarla. El sistema recordará tus ajustes para futuros envíos.
+            </div>
+
+            <h3>🚨 Problemas comunes y soluciones</h3>
+            
+            <div class="alert alert-warning">
+                <strong>❌ Error "Authentication failed":</strong><br>
+                • Verifica que usuario y contraseña sean correctos<br>
+                • Para Gmail/Outlook: usa contraseña de aplicación, no la normal<br>
+                • Verifica que el servidor SMTP sea correcto
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>❌ Error "Could not connect to SMTP host":</strong><br>
+                • Verifica el servidor SMTP y puerto<br>
+                • Cambia entre SSL (465) y TLS (587)<br>
+                • Contacta con tu proveedor de hosting
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>❌ Correos no llegan:</strong><br>
+                • Revisa la carpeta de spam/correo no deseado<br>
+                • Verifica que el "Email del remitente" sea válido<br>
+                • Algunos proveedores limitan envíos masivos
+            </div>
+
+        </section>
+
+        <section>
+            <h2>💅 Ejemplos de configuración para centros de estética</h2>
+            
+            <div class="alert alert-success">
+                <strong>🎯 Configuraciones de "ejemplo" para entreunosyceros y centros similares:</strong> Ejemplos prácticos de configuración SMTP, esto es necesario adaptarlo a los datos de la cuenta a utilizar.
+            </div>
+
+            <h3>📧 Ejemplo 1: Gmail empresarial</h3>
+            <div class="feature-card">
+                <div class="code-block">
+                    <strong>Servidor SMTP:</strong> smtp.gmail.com<br>
+                    <strong>Usuario SMTP:</strong> info@centroentreunosyceros.com<br>
+                    <strong>Email del remitente:</strong> info@centroentreunosyceros.com<br>
+                    <strong>Nombre del remitente:</strong> Centro entreunosyceros<br>
+                    <strong>Puerto:</strong> 465<br>
+                    <strong>Seguridad:</strong> SSL
+                </div>
+                <p><strong>Resultado en el correo:</strong> "Centro entreunosyceros" &lt;info@centroentreunosyceros.com&gt;</p>
+                <p><strong>Ideal para:</strong> Comunicación profesional con dominio propio</p>
+            </div>
+
+            <h3>📧 Ejemplo 2: Gmail personal</h3>
+            <div class="feature-card">
+                <div class="code-block">
+                    <strong>Servidor SMTP:</strong> smtp.gmail.com<br>
+                    <strong>Usuario SMTP:</strong> entreunosyceroscentro@gmail.com<br>
+                    <strong>Email del remitente:</strong> entreunosyceroscentro@gmail.com<br>
+                    <strong>Nombre del remitente:</strong> entreunosyceros Centro de Belleza<br>
+                    <strong>Puerto:</strong> 465<br>
+                    <strong>Seguridad:</strong> SSL
+                </div>
+                <p><strong>Resultado en el correo:</strong> "entreunosyceros Centro de Belleza" &lt;entreunosyceroscentro@gmail.com&gt;</p>
+                <p><strong>Ideal para:</strong> Empezar rápidamente sin dominio propio</p>
+            </div>
+
+            <h3>📧 Ejemplo 3: Hosting Español (Ionos)</h3>
+            <div class="feature-card">
+                <div class="code-block">
+                    <strong>Servidor SMTP:</strong> smtp.ionos.es<br>
+                    <strong>Usuario SMTP:</strong> marketing@ejemplo.es<br>
+                    <strong>Email del remitente:</strong> marketing@ejemplo.es<br>
+                    <strong>Contraseña:</strong> [contraseña del correo]<br>
+                    <strong>Nombre del remitente:</strong> Equipo entreunosyceros<br>
+                    <strong>Puerto:</strong> 587<br>
+                    <strong>Seguridad:</strong> TLS
+                </div>
+                <p><strong>Resultado en el correo:</strong> "Equipo entreunosyceros" &lt;marketing@ejemplo.es&gt;</p>
+                <p><strong>Ideal para:</strong> Dominio .es con hosting español</p>
+            </div>
+
+
+        <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280;">
+                🚀 Sistema de Correos entreunosyceros - Versión de Junio 2025<br>
+                <small>✅ Creado y documentado por <a href="https://entreunosyceros.net" title="about entreunosyceros" target="_blank">entreunosyceros</a></small><br>
+                <small style="color: #16a34a;"><strong>Estado:</strong> Completamente funcional y verificado</small><br/>
+                <small>Estos son solo ejemplos!!!</small>
+            </p>
+        </footer>
+    </div>
+
+</body>
+</html>

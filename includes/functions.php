@@ -57,22 +57,47 @@ function obtenerCorreosPorFecha() {
     
     $correos = [];
     
+    // Buscar la columna de tratamientos y la de email de forma dinámica
+    $headerRow = 1;
+    $highestColumn = $worksheet->getHighestColumn();
+    $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+    $colEmail = null;
+    $colNombre = null;
+    $colTratamientos = null;
+    // Buscar nombres de columna
+    for ($col = 1; $col <= $highestColumnIndex; $col++) {
+        $header = strtolower(trim((string)$worksheet->getCellByColumnAndRow($col, $headerRow)->getValue()));
+        if ($header === 'email' || $header === 'correo' || $header === 'e-mail') {
+            $colEmail = $col;
+        }
+        if ($header === 'nombre') {
+            $colNombre = $col;
+        }
+        if (strpos($header, 'tratamiento') !== false) {
+            $colTratamientos = $col;
+        }
+    }
+    if ($colEmail === null || $colNombre === null) {
+        // No se encontró columna de email o nombre
+        return [];
+    }
     for ($row = 2; $row <= $highestRow; ++$row) {
-        $correo = $worksheet->getCell('L' . $row)->getValue();
-        $nombre = $worksheet->getCell('B' . $row)->getValue();
-        $fechaCell = $worksheet->getCell('N' . $row)->getValue();
-        $tratamientos = $worksheet->getCell('O' . $row)->getValue();
-        
+        $correoRaw = $worksheet->getCellByColumnAndRow($colEmail, $row)->getValue();
+        $nombreRaw = $worksheet->getCellByColumnAndRow($colNombre, $row)->getValue();
+        $correo = trim((string)($correoRaw ?? ''));
+        $nombre = trim((string)($nombreRaw ?? ''));
+        $tratamientos = '';
+        if ($colTratamientos !== null) {
+            $tratamientos = (string)($worksheet->getCellByColumnAndRow($colTratamientos, $row)->getValue() ?? '');
+        }
         // Validar que el correo no esté vacío y tenga formato válido
         if (!empty($correo) && filter_var($correo, FILTER_VALIDATE_EMAIL)) {
             $correos[$correo] = [
                 'nombre' => $nombre,
-                'fecha' => $fechaCell,
                 'tratamientos' => $tratamientos
             ];
         }
     }
-    
     return $correos;
 }
 
@@ -163,7 +188,7 @@ function agregarReferenciasImagenes($mensaje, $imagenes) {
     $imagenesAdjuntas = [];
     
     foreach ($imagenes as $imagen) {
-        $nombreImagen = htmlspecialchars($imagen['name']);
+        $nombreImagen = htmlspecialchars($imagen['name'] ?? '');
         
         // Para imágenes adjuntas tradicionales
         if (!isset($imagen['es_del_editor']) || !$imagen['es_del_editor']) {
@@ -174,7 +199,7 @@ function agregarReferenciasImagenes($mensaje, $imagenes) {
             
             // Crear imagen embebida con enlace clickeable si existe
             if (!empty($imagen['link'])) {
-                $linkLimpio = htmlspecialchars($imagen['link']);
+                $linkLimpio = htmlspecialchars($imagen['link'] ?? '');
                 $referencias[] = '<div style="margin: 20px 0; text-align: center;">
                     <a href="' . $linkLimpio . '" target="_blank" style="text-decoration: none; display: inline-block;">
                         <img src="cid:' . $cid . '" alt="' . $nombreImagen . '" style="max-width: 400px; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s;">
@@ -393,10 +418,6 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
                 // Detectar alineación del contexto alrededor de la imagen
                 $alineacion = detectarAlineacionImagen($mensajeLimpio, $match[0][1]);
                 
-                // DEBUG: Log del width y height detectados
-                // error_log("DEBUG: Imagen #$numeroImagen - width: " . var_export($width, true) . ", height: " . var_export($height, true));
-                // error_log("DEBUG: Atributos originales: " . $atributosImg);
-                
                 // Agregar a la lista de imágenes extraídas con información completa
                 $imagenesExtraidas[] = [
                     'tmp_name' => $archivoTemporal,
@@ -452,15 +473,15 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
                         . '<![endif]-->'
                         . '</td></tr></table>';
                 } elseif ($alineacion === 'right') {
+                    // Estructura robusta para alineación a la derecha compatible con todos los clientes
                     $imgConCid = '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0;mso-table-lspace:0pt;mso-table-rspace:0pt;">'
                         . '<tr><td align="right" valign="top" style="text-align:right!important;padding:0;">'
                         . '<!--[if mso | IE]>'
                         . '<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="right">'
                         . '<![endif]-->'
-                        . '<table align="right" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 0 auto;mso-table-lspace:0pt;mso-table-rspace:0pt;">'
-                        . '<tr><td align="right" style="text-align:right;">'
-                        . $imgTag .
-                        '</td></tr></table>'
+                        . '<div align="right" style="display:inline-block;text-align:right!important;margin:0;">'
+                        . $imgTag
+                        . '</div>'
                         . '<!--[if mso | IE]>'
                         . '</td></tr></table>'
                         . '<![endif]-->'
@@ -507,46 +528,63 @@ function procesarImagenesBase64DelMensaje($mensaje, &$imagenesExtraidas) {
  */
 function detectarAlineacionImagen($html, $posicionImagen) {
     // Buscar hacia atrás desde la posición de la imagen para encontrar contenedores con alineación
-    $fragmentoAnterior = substr($html, 0, $posicionImagen + 500); // Ampliado para capturar más contexto
+    $fragmentoAnterior = substr($html, 0, $posicionImagen + 1000); // Ampliado para capturar más contexto
     
-    // error_log("DEBUG: Analizando fragmento para alineación - longitud: " . strlen($fragmentoAnterior));
+    // 1. Buscar primero en contenedores image-container con clases específicas (más específico)
+    if (preg_match_all('/<div[^>]*class="[^"]*image-container[^"]*align-(left|center|right)[^"]*"/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
+        $ultimaCoincidencia = end($matches[1]);
+        if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
+            $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
+            return $alineacionDetectada;
+        }
+    }
     
-    // 1. Buscar primero en estilos CSS text-align
+    // 2. Buscar en contenedores image-container con text-align en estilo
+    if (preg_match_all('/<div[^>]*class="[^"]*image-container[^"]*"[^>]*style="[^"]*text-align:\s*(left|center|right|justify)[^"]*"/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
+        $ultimaCoincidencia = end($matches[1]);
+        if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
+            $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
+            return $alineacionDetectada;
+        }
+    }
+    
+    // 3. Buscar el contenedor image-container más cercano y luego buscar su alineación
+    if (preg_match_all('/<div[^>]*class="[^"]*image-container[^"]*"[^>]*>/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
+        $ultimoContenedor = end($matches[0]);
+        if ($ultimoContenedor && !empty($ultimoContenedor[0])) {
+            $contenedorHtml = $ultimoContenedor[0];
+            
+            // Buscar text-align en el contenedor
+            if (preg_match('/text-align:\s*(left|center|right|justify)/i', $contenedorHtml, $styleMatch)) {
+                return strtolower(trim($styleMatch[1]));
+            }
+            
+            // Buscar clases de alineación
+            if (preg_match('/class="[^"]*align-(left|center|right)[^"]*"/i', $contenedorHtml, $classMatch)) {
+                return strtolower(trim($classMatch[1]));
+            }
+        }
+    }
+    
+    // 4. Buscar en cualquier elemento con text-align en CSS (más general)
     if (preg_match_all('/text-align:\s*(left|center|right|justify)/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
         // Tomar la coincidencia más cercana a la imagen (la última)
         $ultimaCoincidencia = end($matches[1]);
         if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
             $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
-            // error_log("DEBUG: Alineación detectada en CSS: " . $alineacionDetectada);
             return $alineacionDetectada;
         }
     }
     
-    // 2. Buscar en atributos align
+    // 5. Buscar en atributos align
     if (preg_match_all('/align="(left|center|right|justify)"/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
         $ultimaCoincidencia = end($matches[1]);
         if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
-            $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
-            // error_log("DEBUG: Alineación detectada en atributo align: " . $alineacionDetectada);
-            return $alineacionDetectada;
-        }
-    }
-    
-    // 3. Buscar específicamente en elementos contenedores como <div> y <p>
-    if (preg_match_all('/<(?:div|p)[^>]*style="[^"]*text-align:\s*(left|center|right|justify)[^"]*"/i', $fragmentoAnterior, $matches, PREG_OFFSET_CAPTURE)) {
-        // El grupo de captura correcto es el primero (índice 1)
-        if (isset($matches[1]) && !empty($matches[1])) {
-            $ultimaCoincidencia = end($matches[1]);
-            if ($ultimaCoincidencia && !empty($ultimaCoincidencia[0])) {
-                $alineacionDetectada = strtolower(trim($ultimaCoincidencia[0]));
-                // error_log("DEBUG: Alineación detectada en elemento contenedor: " . $alineacionDetectada);
-                return $alineacionDetectada;
-            }
+            return strtolower(trim($ultimaCoincidencia[0]));
         }
     }
 
-    // error_log("DEBUG: No se detectó alineación, usando 'center' por defecto");
-    return 'center'; // Por defecto
+    return 'left'; // Por defecto a la izquierda para compatibilidad
 }
 
 /**
@@ -662,6 +700,69 @@ function limpiarHTMLEditor($html) {
         // En caso de error, devolver HTML original o string vacío
         return $html ?? '';
     }
+}
+
+/**
+ * Función para limpiar archivos Excel antiguos del sistema
+ * Se ejecuta automáticamente en diversas operaciones
+ */
+function limpiarArchivosExcelAntiguos($mantenerDias = 2) {
+    $directorioBase = __DIR__ . '/..';
+    $patron = $directorioBase . '/clientes_*.xlsx';
+    $archivos = glob($patron);
+    $tiempoLimite = time() - ($mantenerDias * 24 * 60 * 60);
+    $archivosEliminados = 0;
+    
+    foreach ($archivos as $archivo) {
+        // Verificar que sea un archivo de clientes
+        if (preg_match('/clientes_\d{2}-\d{2}-\d{4}\.xlsx$/', basename($archivo))) {
+            // Si mantenerDias es 0, eliminar TODOS los archivos sin verificar fecha
+            $debeEliminar = ($mantenerDias === 0) || (filemtime($archivo) < $tiempoLimite);
+            
+            if ($debeEliminar) {
+                if (unlink($archivo)) {
+                    $archivosEliminados++;
+                }
+            }
+        }
+    }
+    
+    return $archivosEliminados;
+}
+
+/**
+ * Función para obtener información de archivos Excel en el sistema
+ */
+function obtenerInfoArchivosExcel() {
+    $directorioBase = __DIR__ . '/..';
+    $patron = $directorioBase . '/clientes_*.xlsx';
+    $archivos = glob($patron);
+    
+    $info = [
+        'total_archivos' => count($archivos),
+        'archivos' => [],
+        'espacio_total' => 0
+    ];
+    
+    foreach ($archivos as $archivo) {
+        $stat = stat($archivo);
+        $archivoInfo = [
+            'nombre' => basename($archivo),
+            'tamaño' => $stat['size'],
+            'fecha_modificacion' => date('d-m-Y H:i:s', $stat['mtime']),
+            'dias_antiguedad' => floor((time() - $stat['mtime']) / (24 * 60 * 60))
+        ];
+        
+        $info['archivos'][] = $archivoInfo;
+        $info['espacio_total'] += $stat['size'];
+    }
+    
+    // Ordenar por fecha de modificación (más reciente primero)
+    usort($info['archivos'], function($a, $b) {
+        return $b['dias_antiguedad'] <=> $a['dias_antiguedad'];
+    });
+    
+    return $info;
 }
 ?>
 

@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Iniciar Sistema de Correos Ylekara",
+			"type": "shell",
+			"command": "cd /var/www/html/PRACTICAS && python3 -m http.server 8080",
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

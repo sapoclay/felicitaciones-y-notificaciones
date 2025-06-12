@@ -7,5 +7,16 @@
  * el procesador correspondiente para mantener la separación de responsabilidades.
  */
 
+// Verificar autenticación antes de continuar
+require_once __DIR__ . '/includes/auth.php';
+
+if (!estaAutenticado()) {
+    header('Location: login.php');
+    exit;
+}
+
+// Incluir funciones principales para la limpieza automática
+require_once __DIR__ . '/includes/functions.php';
+
 // Incluir el procesador principal
 require_once __DIR__ . '/process.php';

@@ -252,7 +252,38 @@ function alignImage(imgId, alignment) {
     if (img) {
         const container = img.closest('.image-container');
         if (container) {
+            // Aplicar alineación más explícita para correos electrónicos
             container.style.textAlign = alignment;
+            
+            // Agregar clases CSS para mayor especificidad
+            container.classList.remove('align-left', 'align-center', 'align-right');
+            container.classList.add(`align-${alignment}`);
+            
+            // También aplicar estilos directos en la imagen para mayor compatibilidad
+            if (alignment === 'right') {
+                container.style.textAlign = 'right';
+                container.style.marginLeft = 'auto';
+                container.style.marginRight = '0';
+                container.style.display = 'block';
+                img.style.display = 'block';
+                img.style.marginLeft = 'auto';
+                img.style.marginRight = '0';
+            } else if (alignment === 'center') {
+                container.style.textAlign = 'center';
+                container.style.margin = '10px auto';
+                container.style.display = 'block';
+                img.style.display = 'block';
+                img.style.margin = '0 auto';
+            } else if (alignment === 'left') {
+                container.style.textAlign = 'left';
+                container.style.marginLeft = '0';
+                container.style.marginRight = 'auto';
+                container.style.display = 'block';
+                img.style.display = 'block';
+                img.style.marginLeft = '0';
+                img.style.marginRight = 'auto';
+            }
+            
             updateHiddenTextarea();
             mostrarNotificacion(`Imagen alineada a la ${alignment === 'left' ? 'izquierda' : alignment === 'right' ? 'derecha' : 'centro'}`, 'exito');
             hideImageControls(imgId);
@@ -381,8 +412,10 @@ function handleFileSelect(event) {
     const file = event.target.files[0];
     if (file) {
         const selectedFileElement = document.getElementById('selectedFileName');
-        selectedFileElement.textContent = file.name;
-        selectedFileElement.classList.add('active');
+        if (selectedFileElement) {
+            selectedFileElement.textContent = file.name;
+            selectedFileElement.classList.add('active');
+        }
         
         const formData = new FormData();
         formData.append('excelFile', file);
@@ -396,7 +429,12 @@ function handleFileSelect(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                mostrarNotificacion('Datos cargados correctamente. El archivo usado es clientes_' + new Date().toLocaleDateString('es-ES').replace(/\//g, '-') + '.xlsx', 'exito');
+                // Mostrar mensaje mejorado con información de limpieza
+                let mensaje = data.message;
+                if (data.cleanup_info && data.cleanup_info.files_deleted > 0) {
+                    mensaje += ` (Se eliminaron ${data.cleanup_info.files_deleted} archivo(s) antiguo(s))`;
+                }
+                mostrarNotificacion(mensaje, 'exito');
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
@@ -412,28 +450,201 @@ function handleFileSelect(event) {
 }
 
 /**
- * Funciones para notificaciones
+ * Funciones para notificaciones - VERSION ULTRA ROBUSTA ANTI-ERROR
  */
 function mostrarNotificacion(mensaje, tipo, duracion = 4000) {
-    let contenedor = document.getElementById('notificacion');
-    
-    if (!contenedor) {
-        contenedor = document.createElement('div');
-        contenedor.id = 'notificacion';
-        document.querySelector('h1').after(contenedor);
+    // Función de emergencia - solo console.log
+    function notificacionEmergencia(mensaje, tipo) {
+        if (typeof console !== 'undefined' && console.log) {
+            console.log(`NOTIFICACIÓN ${(tipo || 'INFO').toUpperCase()}: ${mensaje || 'Mensaje vacío'}`);
+        }
     }
     
-    contenedor.className = `mensaje ${tipo}`;
-    contenedor.textContent = mensaje;
-    contenedor.style.display = 'block';
-    contenedor.style.opacity = '1';
-
-    setTimeout(() => {
-        contenedor.style.opacity = '0';
-        setTimeout(() => {
-            contenedor.style.display = 'none';
-        }, 500);
-    }, duracion);
+    // Función de fallback - alert si está disponible
+    function notificacionFallback(mensaje, tipo) {
+        try {
+            if (typeof alert !== 'undefined') {
+                alert(`${(tipo || 'INFO').toUpperCase()}: ${mensaje || 'Mensaje vacío'}`);
+                return true;
+            }
+        } catch (e) {
+            // Si alert falla, usar emergencia
+        }
+        notificacionEmergencia(mensaje, tipo);
+        return false;
+    }
+    
+    // Verificaciones básicas de seguridad
+    if (typeof document === 'undefined') {
+        notificacionEmergencia(mensaje, tipo);
+        return;
+    }
+    
+    if (!document) {
+        notificacionEmergencia(mensaje, tipo);
+        return;
+    }
+    
+    if (typeof document.createElement !== 'function') {
+        notificacionFallback(mensaje, tipo);
+        return;
+    }
+    
+    if (!document.body) {
+        notificacionFallback(mensaje, tipo);
+        return;
+    }
+    
+    if (typeof document.body.appendChild !== 'function') {
+        notificacionFallback(mensaje, tipo);
+        return;
+    }
+    
+    // Función principal - crear notificación DOM
+    function crearNotificacionDOM() {
+        let contenedor;
+        
+        try {
+            contenedor = document.createElement('div');
+        } catch (e) {
+            return null;
+        }
+        
+        if (!contenedor) {
+            return null;
+        }
+        
+        // Configurar contenido de forma segura
+        try {
+            if (typeof contenedor.textContent !== 'undefined') {
+                contenedor.textContent = mensaje || 'Mensaje vacío';
+            } else if (typeof contenedor.innerText !== 'undefined') {
+                contenedor.innerText = mensaje || 'Mensaje vacío';
+            } else {
+                return null;
+            }
+        } catch (e) {
+            return null;
+        }
+        
+        // Configurar ID de forma segura
+        try {
+            contenedor.id = 'notificacion-ultra-robusta';
+        } catch (e) {
+            // ID no crítico, continuar
+        }
+        
+        // Aplicar estilos de forma ultra segura
+        if (contenedor.style && typeof contenedor.style === 'object') {
+            try {
+                // Estilos básicos uno por uno para evitar errores
+                contenedor.style.position = 'fixed';
+                contenedor.style.top = '20px';
+                contenedor.style.right = '20px';
+                contenedor.style.zIndex = '9999';
+                contenedor.style.maxWidth = '500px';
+                contenedor.style.minWidth = '300px';
+                contenedor.style.padding = '15px 20px';
+                contenedor.style.borderRadius = '8px';
+                contenedor.style.fontSize = '14px';
+                contenedor.style.lineHeight = '1.5';
+                contenedor.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                contenedor.style.whiteSpace = 'pre-line';
+                contenedor.style.opacity = '0';
+                contenedor.style.display = 'block';
+                contenedor.style.fontFamily = 'Arial, sans-serif';
+                contenedor.style.border = '1px solid rgba(0,0,0,0.1)';
+                
+                // Colores según tipo
+                if (tipo === 'exito') {
+                    contenedor.style.backgroundColor = '#4CAF50';
+                    contenedor.style.color = 'white';
+                    contenedor.style.borderLeft = '5px solid #388E3C';
+                } else if (tipo === 'error') {
+                    contenedor.style.backgroundColor = '#f44336';
+                    contenedor.style.color = 'white';
+                    contenedor.style.borderLeft = '5px solid #D32F2F';
+                } else if (tipo === 'warning') {
+                    contenedor.style.backgroundColor = '#FF9800';
+                    contenedor.style.color = '#333';
+                    contenedor.style.borderLeft = '5px solid #FFA000';
+                } else {
+                    contenedor.style.backgroundColor = '#2196F3';
+                    contenedor.style.color = 'white';
+                    contenedor.style.borderLeft = '5px solid #1976D2';
+                }
+            } catch (e) {
+                // Si fallan los estilos, al menos mostrar sin estilos
+            }
+        }
+        
+        return contenedor;
+    }
+    
+    // Proceso principal con manejo de errores total
+    try {
+        // Remover notificación anterior si existe
+        try {
+            const anterior = document.getElementById('notificacion-ultra-robusta');
+            if (anterior && anterior.parentNode && typeof anterior.parentNode.removeChild === 'function') {
+                anterior.parentNode.removeChild(anterior);
+            }
+        } catch (e) {
+            // Ignorar errores al remover anterior
+        }
+        
+        // Crear nueva notificación
+        const contenedor = crearNotificacionDOM();
+        if (!contenedor) {
+            notificacionFallback(mensaje, tipo);
+            return;
+        }
+        
+        // Insertar en DOM
+        try {
+            document.body.appendChild(contenedor);
+        } catch (e) {
+            notificacionFallback(mensaje, tipo);
+            return;
+        }
+        
+        // Animación de aparición
+        if (contenedor.style && typeof setTimeout !== 'undefined') {
+            try {
+                setTimeout(function() {
+                    if (contenedor && contenedor.style) {
+                        contenedor.style.opacity = '1';
+                    }
+                }, 10);
+            } catch (e) {
+                // Si falla animación, al menos está visible
+            }
+            
+            // Auto-ocultar
+            try {
+                setTimeout(function() {
+                    if (contenedor && contenedor.style && contenedor.parentNode) {
+                        contenedor.style.opacity = '0';
+                        setTimeout(function() {
+                            if (contenedor && contenedor.parentNode && typeof contenedor.parentNode.removeChild === 'function') {
+                                try {
+                                    contenedor.parentNode.removeChild(contenedor);
+                                } catch (e) {
+                                    // Ignorar errores al remover
+                                }
+                            }
+                        }, 500);
+                    }
+                }, duracion || 4000);
+            } catch (e) {
+                // Si falla auto-ocultar, la notificación queda visible
+            }
+        }
+        
+    } catch (error) {
+        // Último recurso absoluto
+        notificacionFallback(mensaje, tipo);
+    }
 }
 
 function ocultarMensaje() {
@@ -706,9 +917,11 @@ function createTooltip(text, x, y) {
     if (rect.top < 0) {
         currentTooltip.style.top = (y + 25) + 'px';
     }
-    
+
     setTimeout(() => {
-        currentTooltip.classList.add('show');
+        if (currentTooltip) {
+            currentTooltip.classList.add('show');
+        }
     }, 10);
 }
 
@@ -716,7 +929,7 @@ function removeTooltip() {
     if (currentTooltip) {
         currentTooltip.classList.remove('show');
         setTimeout(() => {
-            if (currentTooltip) {
+            if (currentTooltip && currentTooltip.parentNode) {
                 currentTooltip.remove();
                 currentTooltip = null;
             }
@@ -827,7 +1040,7 @@ function initializeConfigForm() {
     const togglePassword = document.querySelector('.toggle-password');
     if (togglePassword) {
         togglePassword.addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
+            const passwordInput = document.getElementById('smtp_password');
             const type = passwordInput.getAttribute('type');
             
             if (type === 'password') {
@@ -855,9 +1068,9 @@ function initializeConfigForm() {
             const formData = {
                 smtp: {
                     host: document.getElementById('host').value.trim(),
-                    username: document.getElementById('username').value.trim(),
-                    password: document.getElementById('password').value,
-                    port: parseInt(document.getElementById('port').value, 10),
+                    username: document.getElementById('smtp_username').value.trim(),
+                    password: document.getElementById('smtp_password').value,
+                    port: parseInt(document.getElementById('port').value, 10) || 465,
                     from_email: document.getElementById('from_email').value.trim(),
                     from_name: document.getElementById('from_name').value.trim(),
                     secure: document.getElementById('secure').value
@@ -871,8 +1084,14 @@ function initializeConfigForm() {
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data); // Debug log
                 if (data.success) {
                     document.getElementById('sidebar').classList.remove('active');
                     document.getElementById('sidebarBackdrop').classList.remove('active');
@@ -945,7 +1164,7 @@ function initializeTooltips() {
         });
 
         element.addEventListener('mousemove', function(e) {
-            if (currentTooltip) {
+            if (currentTooltip && currentTooltip.parentNode) {
                 const x = e.pageX;
                 const y = e.pageY;
                 
@@ -1136,51 +1355,58 @@ function openIconPicker() {
     
     console.log('✅ Elementos encontrados correctamente');
     
-    // Guardar la posición actual del cursor
-    if (editor.contains(document.activeElement) || editor === document.activeElement) {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-            savedRange = selection.getRangeAt(0).cloneRange();
-            console.log('✅ Posición del cursor guardada');
-        }
-    } else {
-        // Si el editor no tiene foco, enfocarlo y colocar el cursor al final
-        editor.focus();
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(editor);
-        range.collapse(false); // Colocar al final
-        selection.removeAllRanges();
-        selection.addRange(range);
-        savedRange = range.cloneRange();
-        console.log('✅ Editor enfocado y cursor colocado al final');
-    }
+    // Asegurar que el editor tiene foco antes de guardar la posición
+    editor.focus();
     
-    if (allIcons.length === 0) {
-        console.log('📦 Inicializando colección de iconos...');
-        initializeIconCollection();
-        console.log(`✅ Colección inicializada con ${allIcons.length} iconos`);
-    }
-    
-    console.log('🎨 Mostrando modal...');
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    // Mostrar todos los iconos por defecto
-    showIconCategory('all');
-    
-    // Enfocar el campo de búsqueda
+    // Pequeña pausa para asegurar que el foco se establece
     setTimeout(() => {
-        const searchInput = document.getElementById('iconSearch');
-        if (searchInput) {
-            searchInput.focus();
-            console.log('🔍 Campo de búsqueda enfocado');
+        const selection = window.getSelection();
+        
+        if (selection.rangeCount > 0) {
+            // Guardar la posición actual del cursor
+            savedRange = selection.getRangeAt(0).cloneRange();
+            console.log('✅ Posición del cursor guardada correctamente');
         } else {
-            console.error('❌ No se encontró el campo de búsqueda');
+            // Si no hay selección, crear una al final del contenido
+            const range = document.createRange();
+            if (editor.childNodes.length > 0) {
+                range.setStartAfter(editor.lastChild);
+            } else {
+                range.setStart(editor, 0);
+            }
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            savedRange = range.cloneRange();
+            console.log('✅ Cursor colocado y guardado al final del contenido');
         }
-    }, 100);
-    
-    console.log('🎉 Selector de iconos abierto exitosamente');
+        
+        if (allIcons.length === 0) {
+            console.log('📦 Inicializando colección de iconos...');
+            initializeIconCollection();
+            console.log(`✅ Colección inicializada con ${allIcons.length} iconos`);
+        }
+        
+        console.log('🎨 Mostrando modal...');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Mostrar todos los iconos por defecto
+        showIconCategory('all');
+        
+        // Enfocar el campo de búsqueda
+        setTimeout(() => {
+            const searchInput = document.getElementById('iconSearch');
+            if (searchInput) {
+                searchInput.focus();
+                console.log('🔍 Campo de búsqueda enfocado');
+            } else {
+                console.error('❌ No se encontró el campo de búsqueda');
+            }
+        }, 100);
+        
+        console.log('🎉 Selector de iconos abierto exitosamente');
+    }, 10);
 }
 
 // Función para cerrar el selector de iconos
@@ -1195,14 +1421,25 @@ function closeIconPicker() {
     // Volver a mostrar todos los iconos
     showIconCategory('all');
     
-    // Restaurar el foco al editor si había una posición guardada
-    if (savedRange) {
-        const editor = document.getElementById('contenido_mensaje');
-        editor.focus();
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(savedRange);
-        savedRange = null; // Limpiar la referencia
+    // Restaurar el foco al editor
+    const editor = document.getElementById('contenido_mensaje');
+    if (editor) {
+        setTimeout(() => {
+            editor.focus();
+            
+            // Si hay una posición guardada, restaurarla
+            if (savedRange) {
+                try {
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(savedRange);
+                    console.log('🎯 Posición del cursor restaurada al cerrar modal');
+                } catch (e) {
+                    console.warn('⚠️ No se pudo restaurar la posición del cursor');
+                    // No limpiar savedRange aquí, se limpiará en insertIcon
+                }
+            }
+        }, 100);
     }
 }
 
@@ -1282,32 +1519,49 @@ function insertIcon(icon) {
         return;
     }
     
-    // Restaurar la posición del cursor guardada
+    // Enfocar el editor primero
+    editor.focus();
+    
+    // Intentar restaurar la posición del cursor guardada
     if (savedRange) {
         console.log('🎯 Restaurando posición del cursor guardada');
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(savedRange);
-        
-        // Insertar el icono en la posición restaurada
-        document.execCommand('insertText', false, icon);
-        console.log('✅ Icono insertado en posición guardada');
+        try {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(savedRange);
+            
+            // Verificar que el rango sigue siendo válido
+            if (selection.rangeCount > 0) {
+                document.execCommand('insertText', false, icon);
+                console.log('✅ Icono insertado en posición guardada');
+            } else {
+                throw new Error('Rango inválido');
+            }
+        } catch (e) {
+            console.warn('⚠️ Rango guardado inválido, usando posición actual');
+            // Si el rango guardado es inválido, usar la posición actual
+            document.execCommand('insertText', false, icon);
+        }
         
         // Limpiar la referencia guardada
         savedRange = null;
     } else {
-        console.log('🎯 Usando fallback: insertando al final del editor');
-        // Fallback: enfocar el editor e insertar al final
-        editor.focus();
+        console.log('🎯 No hay posición guardada, usando posición actual del cursor');
+        // Si no hay rango guardado, insertar en la posición actual del cursor
         const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(editor);
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        
-        document.execCommand('insertText', false, icon);
-        console.log('✅ Icono insertado al final del editor');
+        if (selection.rangeCount > 0) {
+            document.execCommand('insertText', false, icon);
+            console.log('✅ Icono insertado en posición actual del cursor');
+        } else {
+            // Fallback: colocar el cursor al final e insertar
+            const range = document.createRange();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            document.execCommand('insertText', false, icon);
+            console.log('✅ Icono insertado al final del editor (fallback)');
+        }
     }
     
     // Actualizar el textarea oculto
@@ -1320,7 +1574,9 @@ function insertIcon(icon) {
     mostrarNotificacion(`Icono ${icon} insertado correctamente`, 'exito', 2000);
     
     // Mantener el foco en el editor
-    editor.focus();
+    setTimeout(() => {
+        editor.focus();
+    }, 100);
     
     console.log('🎉 Proceso de inserción completado exitosamente');
 }
@@ -1438,4 +1694,106 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Sistema de iconos inicializado correctamente');
 });
+
+/**
+ * ===============================
+ * SISTEMA DE LIMPIEZA DE ARCHIVOS
+ * ===============================
+ */
+
+/**
+ * Función para limpiar archivos Excel antiguos
+ */
+async function limpiarArchivosExcel() {
+    try {
+        console.log('🧹 Iniciando limpieza de archivos Excel...');
+        
+        const response = await fetch('utils/limpiar_archivos.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'limpiar',
+                mantener_dias: 2
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Limpieza completada: ${data.archivos_eliminados} archivos eliminados`);
+            if (data.archivos_eliminados > 0) {
+                mostrarNotificacion(
+                    `Limpieza automática: ${data.archivos_eliminados} archivo(s) antiguo(s) eliminado(s)`,
+                    'info'
+                );
+            }
+            return data;
+        } else {
+            console.error('❌ Error en limpieza:', data.error);
+            return { success: false, error: data.error };
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al limpiar archivos:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Inicializar sistema de limpieza automática (solo al cerrar navegador)
+ */
+function inicializarLimpiezaAutomatica() {
+    console.log('🚀 Inicializando limpieza automática (solo al cerrar navegador)...');
+    
+    // Limpieza al cerrar ventana/pestaña - ELIMINAR TODOS LOS ARCHIVOS
+    window.addEventListener('beforeunload', async (event) => {
+        console.log('👋 Ejecutando limpieza completa al cerrar...');
+        
+        // Usar navigator.sendBeacon para envío asíncrono confiable
+        if (navigator.sendBeacon) {
+            const data = new FormData();
+            data.append('action', 'limpiar');
+            data.append('mantener_dias', '0'); // 0 = eliminar TODOS los archivos
+            
+            navigator.sendBeacon('utils/limpiar_archivos.php', data);
+        } else {
+            // Fallback para navegadores antiguos
+            try {
+                await fetch('utils/limpiar_archivos.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'limpiar',
+                        mantener_dias: 0  // 0 = eliminar TODOS los archivos
+                    }),
+                    keepalive: true
+                });
+            } catch (error) {
+                console.log('⚠️ No se pudo completar limpieza al cerrar:', error);
+            }
+        }
+    });
+    
+    console.log('✅ Sistema de limpieza automática configurado (solo al cerrar navegador)');
+}
+
+// Inicializar limpieza automática cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Pequeño retraso para asegurar que todo esté cargado
+    setTimeout(() => {
+        inicializarLimpiezaAutomatica();
+    }, 2000);
+});
+
+// Exportar funciones para uso manual
+window.limpiarArchivosExcel = limpiarArchivosExcel;
+window.inicializarLimpiezaAutomatica = inicializarLimpiezaAutomatica;
 

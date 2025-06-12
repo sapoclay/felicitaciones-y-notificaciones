@@ -1,4 +1,17 @@
 <?php
+// Verificar autenticación antes de continuar
+require_once 'includes/auth.php';
+
+if (!estaAutenticado()) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => 'Sesión expirada. Por favor, inicie sesión nuevamente.',
+        'redirect' => 'login.php'
+    ]);
+    exit;
+}
+
 header('Content-Type: application/json');
 
 // Función para validar los datos de entrada
@@ -27,8 +40,6 @@ function loadCurrentConfig() {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        error_log('Iniciando actualización de configuración');
-        
         // Limpiar mensajes de la sesión relacionados con el envío de correos ANTES de procesar el formulario
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -77,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'host' => isset($input['smtp']['host']) ? htmlspecialchars($input['smtp']['host'], ENT_QUOTES, 'UTF-8') : '',
                 'username' => isset($input['smtp']['username']) ? htmlspecialchars($input['smtp']['username'], ENT_QUOTES, 'UTF-8') : '',
                 'password' => $input['smtp']['password'] ?? '',
-                'port' => isset($input['smtp']['port']) ? intval($input['smtp']['port']) : '',
+                'port' => isset($input['smtp']['port']) ? intval($input['smtp']['port']) ?: 465 : 465,
                 'from_email' => isset($input['smtp']['from_email']) ? htmlspecialchars($input['smtp']['from_email'], ENT_QUOTES, 'UTF-8') : '',
                 'from_name' => isset($input['smtp']['from_name']) ? htmlspecialchars($input['smtp']['from_name'], ENT_QUOTES, 'UTF-8') : '',
                 'secure' => isset($input['smtp']['secure']) ? htmlspecialchars($input['smtp']['secure'], ENT_QUOTES, 'UTF-8') : ''
@@ -95,7 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Error al escribir el archivo de configuración');
         }
         
-        error_log('Configuración actualizada correctamente en: ' . $configFile);
         echo json_encode([
             'success' => true, 
             'message' => 'Configuración actualizada correctamente'

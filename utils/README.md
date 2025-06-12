@@ -1,15 +1,50 @@
-# Utilidades
+# 🧰 Utilidades del Sistema
 
-Esta carpeta contiene scripts de utilidad que no son parte del flujo principal de la aplicación pero pueden ser útiles para mantenimiento y desarrollo.
+Este directorio contiene herramientas auxiliares para el mantenimiento y gestión del sistema de envío de correos masivos.
 
-## Archivos:
+## 📁 Archivos Incluidos
 
-### `generar_excel.php`
-- **Propósito**: Generar archivos Excel de ejemplo para pruebas
-- **Uso**: Script independiente para crear datos de prueba
-- **Dependencias**: PhpSpreadsheet
-- **Estado**: No integrado en la aplicación principal
+### 🧹 Sistema de Limpieza Automática Simplificado
+- **`limpiar_archivos.php`** - Script principal de limpieza automática de archivos Excel
+- **`SISTEMA_SIMPLIFICADO_SIN_CRON.md`** - Documentación completa del sistema simplificado (SIN cron jobs)
 
-## Uso
+### 📊 Generación de Datos
+- **`generar_excel.php`** - Generador de archivos Excel de ejemplo para pruebas
 
-Estos archivos pueden ejecutarse de forma independiente cuando sea necesario realizar tareas de mantenimiento o generar datos de prueba.
+---
+
+## 🚀 Uso del Sistema Simplificado
+
+### Limpieza Automática (SIN Cron Jobs)
+```bash
+# Limpieza manual (si es necesaria)
+php limpiar_archivos.php 0  # Eliminar TODOS los archivos
+
+# El sistema funciona automáticamente:
+# ✅ Al cargar archivos -> elimina todos los anteriores
+# ✅ Al cerrar navegador -> elimina todos los archivos
+```
+
+### Generar Archivo Excel de Prueba
+```bash
+php generar_excel.php
+```
+
+---
+
+## 📋 Características del Sistema Simplificado
+
+### ✅ Funcionalidades Activas
+- **Limpieza al cargar archivos** - Elimina TODOS los archivos anteriores automáticamente
+- **Limpieza al cerrar navegador** - Elimina TODOS los archivos al cerrar pestaña/ventana
+- **Sin configuración externa** - Funciona sin cron jobs ni privilegios de administrador
+- **Validación de seguridad** - Solo elimina archivos con patrón `clientes_DD-MM-YYYY.xlsx`
+
+### 🛡️ Características de Seguridad
+- Solo elimina archivos `clientes_DD-MM-YYYY.xlsx`
+- Validación de formato con regex
+- Logs de auditoría completos
+- Servidor siempre limpio automáticamente
+
+---
+

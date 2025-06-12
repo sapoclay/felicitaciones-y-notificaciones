@@ -1,4 +1,16 @@
 <?php
+// Verificar autenticación antes de continuar
+require_once __DIR__ . '/../includes/auth.php';
+
+if (!estaAutenticado()) {
+    if (php_sapi_name() === 'cli') {
+        echo "Error: Debe estar autenticado para ejecutar este script.\n";
+        exit(1);
+    } else {
+        header('Location: ../login.php');
+        exit;
+    }
+}
 
 // Establecer zona horaria correcta
 date_default_timezone_set('Europe/Madrid');

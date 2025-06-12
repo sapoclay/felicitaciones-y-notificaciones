@@ -1,233 +1,75 @@
-# 📧 Sistema de envío de correos masivos 📧 
+# Sistema de Correos entreunosyceros
 
-Este programa es un sistema para envío masivo de correos electrónicos con imágenes HTML incrustadas, que ha sido desarrollado en PHP utilizando [Composer](https://getcomposer.org/) y con arquitectura MVC.
+Este proyecto es un sistema web para el envío masivo de correos electrónicos, pensado para centros de cosas, empresas y cualquier organización que necesite gestionar campañas de email personalizadas a partir de archivos Excel.
 
-![web-envia-felicitaciones-promociones](https://github.com/user-attachments/assets/6cec2c18-b4fe-4a31-a6b5-4667bcefbaf2)
+Esto en realidad fue un proyecto para un centro que tenía como base de datos un archivo Excel (cosas de la vida!!) ... Y se trataba de un Excel de unas 2000 líneas. Una vez cargado sin problemas, este programa fué capaz de enviar en bloques de 100 los 2000 emails sin problema.
 
-## 🎯 Características principales
+Este programa lo he probado en un servidor local y en en servidor web sin ningún problema.
 
-### ✨ Funcionalidades base
-- **Editor WYSIWYG avanzado**: Editor visual con formato de texto, inserción de imágenes y selector de iconos/emojis
-- **Selector de iconos/emojis**: Ventana modal con más de 250 iconos organizados por categorías (emociones, objetos, símbolos, naturaleza)
-- **Carga automática de Excel**: Procesa archivos con formato `clientes_DD-MM-YYYY.xlsx`
-- **SMTP múltiple**: Compatible con Gmail, Outlook y servidores personalizados
-- **Progreso en tiempo real**: Seguimiento AJAX del proceso de envío
-- **Filtros por tratamiento**: Segmentación de envíos por tipos de servicio
+## Características principales
 
-### 🚀 Mejoras implementadas (Junio 2025)
-- **✅ Alineación perfecta de imágenes**: Las imágenes del editor respetan la alineación configurada usando tablas HTML para máxima compatibilidad con todos los clientes de correo electrónico
-- **✅ Imágenes embebidas sin duplicados**: Eliminación de adjuntos tradicionales redundantes, manteniendo solo imágenes embebidas con CID únicos
-- **✅ Enlaces clickeables funcionales**: Las imágenes adjuntas incluyen enlaces completamente funcionales y clickeables
-- **✅ Prevención de reenvíos (PRG)**: Implementación del patrón Post-Redirect-Get para evitar el reenvío accidental de formularios al recargar la página
-- **✅ Corrección PHP 8+**: Resolución de advertencias de deprecación relacionadas con valores nulos en expresiones regulares
-- **🆕 Restricciones de tamaño optimizadas**: Límite máximo de 2MB por imagen para compatibilidad con servidores en la nube, con validaciones tanto en cliente como servidor
-- **🆕 Sistema unificado de imágenes**: Las imágenes del editor ahora se comportan exactamente igual que las adjuntas (embebidas con CID), manteniendo la alineación configurada por el usuario
-- **✅ Corrección crítica completada**: Resuelto completamente el problema de contenido perdido cuando el mensaje contenía imágenes del editor. La nueva implementación con sistema de placeholders únicos garantiza la conservación total del contenido
-- **✅ Redimensionado fiel de imágenes**: Las imágenes del editor mantienen el tamaño (width/height) definido por el usuario en el email final, además de la alineación
-- **🪲 Bugfix**: Corregido un error donde el redimensionado se perdía si la imagen tenía alineación personalizada (right/left/center)
-- **🆕 Selector de iconos/emojis**: Nueva funcionalidad que permite insertar iconos y emojis directamente en el editor de texto con una ventana modal intuitiva y categorías organizadas
-![email-enviado](https://github.com/user-attachments/assets/bc1fac52-b872-4ea8-8190-0e1fa98bbb53)
+- **Carga flexible de archivos Excel**: Detecta automáticamente columnas como Nombre, Email, Tratamientos, etc. Solo la columna "Nombre" es obligatoria.
+- **Envío masivo de correos**: Permite seleccionar destinatarios, personalizar el mensaje y adjuntar imágenes.
+- **Gestión de SMTP**: Configuración sencilla para cualquier proveedor (Gmail, Outlook, Ionos, etc). Compatible con SSL/TLS.
+- **Editor visual de mensajes**: Redacta mensajes con formato, listas, enlaces, imágenes y emojis.
+- **Filtrado por tratamientos**: Si el Excel tiene columna de tratamientos, puedes filtrar destinatarios fácilmente.
+- **Soporte para archivos grandes**: Compatible con archivos Excel de muchas columnas y miles de registros.
+- **Validación y compatibilidad**: El sistema informa sobre la compatibilidad del archivo y posibles problemas.
+- **Gestión de usuarios**: Acceso protegido por login. Usuario y contraseña configurables.
+- **Documentación integrada**: Acceso rápido a la documentación desde la interfaz.
 
-## 🛠️ Tecnologías
+## ¿Para qué sirve?
 
-- **Backend**: PHP 7.4+ / PHP 8+, PHPMailer 6.x, PhpSpreadsheet
-- **Frontend**: HTML5, CSS3, JavaScript ES6+ (Vanilla JS)
-- **Arquitectura**: MVC (Model-View-Controller)
-- **Compatibilidad**: Todos los clientes de correo electrónico (Outlook, Gmail, Apple Mail, etc.)
-- **UI/UX**: Editor WYSIWYG nativo con selector de iconos integrado
+- Enviar promociones, felicitaciones o avisos a clientes de forma masiva y personalizada.
+- Gestionar campañas de email marketing desde un entorno privado y seguro.
+- Consultar y filtrar datos de clientes desde archivos Excel sin depender de servicios externos.
 
-## ✅ Estado del Proyecto (Junio 2025)
+## Instalación y uso
 
-### Tareas Completadas:
-1. **✅ Corrección del sistema de alineación de imágenes**
-   - Implementada estructura HTML robusta con tablas para máxima compatibilidad
-   - Soporte completo para Outlook con comentarios condicionales MSO
-   - Alineación izquierda, centro y derecha funcional en todos los clientes
+1. **Clona el repositorio**
+   ```bash
+   git clone https://github.com/tuusuario/sistema-correos-entreunosyceros.git
+   ```
+2. **Instala dependencias PHP**
+   ```bash
+   cd sistema-correos-entreunosyceros
+   composer install
+   ```
+3. **Configura el servidor web**
+   - Puedes usar Apache, Nginx o el servidor de desarrollo incluido:
+   ```bash
+   php -S localhost:8080
+   ```
+4. **Accede al sistema**
+   - Usuario por defecto: `entreunosyceros`
+   - Contraseña por defecto: `entreunosyceros`
 
-2. **✅ Selector de iconos/emojis completo**
-   - Modal responsive con más de 250 iconos en 4 categorías
-   - Navegación intuitiva con pestañas y búsqueda
-   - Integración perfecta en el editor WYSIWYG
-   - Botón 😀 añadido a la barra de herramientas
+## Estructura del proyecto
 
-3. **✅ Cambio de nomenclatura Excel**
-   - Actualizado de `empresas_DD-MM-YYYY.xlsx` a `clientes_DD-MM-YYYY.xlsx`
-   - Archivo de ejemplo renombrado: `clientes_10-06-2025.xlsx`
-   - Todas las referencias en código y documentación actualizadas
+- `index.php` — Página principal y acceso al sistema
+- `views/main.php` — Interfaz principal de gestión y envío de correos
+- `documentacion_flexible.html` — Documentación completa y ejemplos
+- `includes/` — Funciones de autenticación y utilidades
+- `assets/js/` — Scripts de la interfaz
+- `img/` — Imágenes y logotipo
 
-### Sistema Listo para Producción ✨
-- Todas las funcionalidades implementadas y probadas
-- Código limpio sin elementos de debug
-- Documentación completamente actualizada
-- Compatibilidad garantizada con todos los clientes de correo
+## Requisitos
 
-## 📁 Estructura
+- PHP 7.4 o superior
+- Composer
+- Extensiones PHP: `mbstring`, `json`, `openssl`
+- Servidor web (opcional)
 
-```
-├── index.php                    # Punto de entrada principal
-├── process.php                  # Controlador de envío de correos
-├── cargar_excel.php            # Procesador de archivos Excel
-├── config.json                 # Configuración SMTP
-├── composer.json               # Dependencias de Composer
-├── composer.lock               # Versiones exactas instaladas
-├── clientes_10-06-2025.xlsx    # Archivo Excel de ejemplo
-├── styles.css                  # Estilos CSS principales
-├── includes/
-│   └── functions.php           # Lógica de negocio y funciones PHP
-├── views/
-│   └── main.php               # Interfaz de usuario principal
-├── assets/
-│   └── js/
-│       └── main.js            # JavaScript frontend y selector de iconos
-├── utils/
-│   ├── generar_excel.php      # Generador de Excel de ejemplo
-│   └── README.md              # Documentación de utilidades
-└── vendor/                    # Dependencias de Composer (autoload)
-    ├── autoload.php           # Autoloader principal
-    ├── phpmailer/phpmailer/   # Librería PHPMailer para SMTP
-    ├── phpoffice/phpspreadsheet/ # Librería para manejo de Excel
-    ├── composer/              # Archivos internos de Composer
-    ├── markbaker/             # Dependencias matemáticas (Complex, Matrix)
-    ├── maennchen/zipstream-php/ # Compresión ZIP para Excel
-    └── psr/                   # Estándares PSR (HTTP, Cache)
-```
+## Seguridad
 
-## 📊 Formato Excel Requerido
+- Las contraseñas de usuario están cifradas.
+- El acceso está protegido por login.
+- No almacena contraseñas SMTP en texto plano (usa almacenamiento seguro).
 
-Archivo: `clientes_DD-MM-YYYY.xlsx` con 15 columnas (A-O):
+## Créditos
 
-| Col | Campo | Requerido | Ejemplo |
-|-----|-------|-----------|---------|
-| A   | Código | ✅ | EMP001 |
-| B   | Nombre | ✅ | Juan Pérez García |
-| C   | Nombre Comercial | - | Mi Empresa S.L. |
-| D   | Dirección | - | Calle Mayor 123 |
-| E   | CIF | - | B12345678 |
-| F   | Localidad | - | Madrid |
-| G   | Provincia | - | Madrid |
-| H   | C. Postal | - | 28001 |
-| I   | País | - | España |
-| J   | Teléfono | - | 912345678 |
-| K   | Fax | - | 912345679 |
-| L   | **Email** | ✅ | juan@empresa.com |
-| M   | Contacto | - | 684551555 |
-| N   | **Fecha Alta** | ✅ | 05-06-2025 |
-| O   | **Tratamientos** | ✅ | Estética, Peluquería |
+Creado y documentado por [entreunosyceros](https://entreunosyceros.net) 2025
 
-## ⚙️ Instalación
+---
 
-1. **Instalar dependencias**
-```bash
-git clone https://github.com/sapoclay/felicitaciones-y-notificaciones.git
-cd felicitaciones-y-promociones
-composer install
-```
-Si usas windows, composer se debe [descargar desde su página web](https://getcomposer.org/)
-
-2. **Generar Excel ejemplo** (opcional)
-```bash
-php utils/generar_excel.php
-```
-Si es que no tienes el archivo excel sobre el que trabajar
-
-3. **Configurar SMTP** - Configuración del archivo `config.json`. Esto se puede configurar desde la interfaz del programa:
-```json
-{
-    "smtp": {
-        "host": "smtp.gmail.com",
-        "username": "tu@email.com", 
-        "password": "tu_password",
-        "port": 587,
-        "secure": "tls",
-        "from_email": "tu@email.com",
-        "from_name": "Tu Nombre"
-    }
-}
-```
-
-## 🚀 Uso
-
-1. Abrir `index.php` en navegador
-2. Configurar SMTP (panel lateral ☰)
-3. Cargar Excel o generar automáticamente
-4. Escribir mensaje con editor e insertar iconos/emojis 😀
-5. Adjuntar imágenes con enlaces
-6. Filtrar destinatarios por tratamiento
-7. Enviar y monitorear progreso
-
-## 🖼️ Funcionalidad imágenes
-
-- **Base64**: Imágenes incrustadas directamente en HTML
-- **Enlaces**: URLs opcionales por imagen 
-- **Responsive**: Se adapta automáticamente
-- **Compatibilidad**: Funciona en todos los clientes de correo (al menos en todos lo que he probado)
-- **🆕 Restricciones de tamaño**: Máximo 2MB por imagen para compatibilidad con servidores en la nube
-- **🆕 Validación dual**: Control de tamaño tanto en JavaScript (cliente) como PHP (servidor)
-- **🆕 Sistema unificado**: Las imágenes del editor se procesan como adjuntos embebidos igual que las tradicionales, preservando la alineación
-- **🆕 Redimensionado fiel**: El tamaño de la imagen (ancho/alto) definido en el editor se respeta en el email final, incluso si la imagen está alineada a la derecha o izquierda
-
-### Limitaciones de Tamaño
-El sistema ahora incluye restricciones de 2MB por imagen para garantizar compatibilidad con servicios de hosting en la nube:
-- **Validación del cliente**: JavaScript previene la carga de archivos grandes antes del procesamiento
-- **Validación del servidor**: PHP verifica el tamaño tanto de archivos adjuntos como imágenes del editor
-- **Mensajes informativos**: La interfaz informa claramente sobre las restricciones de tamaño
-
-## 😀 Selector de Iconos/Emojis
-![iconos](https://github.com/user-attachments/assets/1445fd42-2e9c-4943-8f38-1d6e2c7ba3ae)
-Nueva funcionalidad integrada en el editor de texto que permite insertar iconos y emojis de manera sencilla e intuitiva:
-
-### 🎯 Características del Selector
-- **Más de 250 iconos**: Amplia colección de emojis organizados por categorías
-- **Categorías temáticas**: Emociones, Objetos, Símbolos, Naturaleza y vista de Todos
-- **Interfaz moderna**: Ventana modal responsive con diseño elegante
-- **Búsqueda rápida**: Campo de búsqueda para encontrar iconos específicos
-- **Inserción directa**: Un clic para insertar el icono en la posición del cursor
-
-### 📂 Categorías Disponibles
-- **😀 Emociones** (48 iconos): 😀 😃 😄 😁 😆 😅 😂 🤣 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚...
-- **📱 Objetos** (70 iconos): 📱 💻 🖥️ ⌨️ 🖱️ 📷 🎵 🎮 ⚽ 🏀 🎤 🎧 📢 🎸 🎻 🎯 🎲...
-- **❤️ Símbolos** (70 iconos): ❤️ 🧡 💛 💚 💙 💜 ⭐ 🌟 💫 ⚡ 💥 🔥 🌈 ☀️ ✅ ❌ ✔️ ❓ ❗...
-- **🌱 Naturaleza** (80 iconos): 🌱 🌿 🍀 🌵 🌲 🌊 🌍 🌙 🌺 🌸 🌼 🌻 🌷 🌹 🍄 🍅 🍆...
-
-### 🚀 Cómo Usar
-1. **Abrir selector**: Clic en el botón 😀 en la barra de herramientas del editor
-2. **Navegar**: Selecciona una categoría o usa la vista "Todos"
-3. **Buscar**: Usa el campo de búsqueda para filtrar iconos (próximamente)
-4. **Insertar**: Haz clic en cualquier icono para insertarlo en el texto
-5. **Cerrar**: ESC, clic fuera del modal o botón X
-
-## 🔧 Configuración SMTP
-
-**Gmail** (requiere contraseña de aplicación. Hay que habilitar en la configuración de la cuenta de Gmail que se pueda utilizar esa cuenta con cuentas de terceros o no seguras ....o algo así):
-```json
-{"host": "smtp.gmail.com", "port": 587, "secure": "tls"}
-```
-
-**Outlook**:
-```json
-{"host": "smtp-mail.outlook.com", "port": 587, "secure": "tls"}
-```
-
-**Servidor personalizado**:
-```json
-{"host": "mail.tudominio.com", "port": 465, "secure": "ssl"}
-```
-
-## 🔍 Solución problemas
-
-- **Excel no carga**: Verificar nombre `clientes_DD-MM-YYYY.xlsx` y 15 columnas
-- **Error SMTP**: Comprobar credenciales y puerto (587/TLS o 465/SSL)
-- **🆕 Imágenes demasiado grandes**: El sistema rechaza imágenes mayores a 2MB automáticamente
-- **🆕 Configuración del servidor**: Ya no es necesario modificar `upload_max_filesize` o `post_max_size` en PHP - el sistema maneja las restricciones internamente
-
-### Migración desde versiones anteriores
-Si actualizas desde una versión anterior que dependía de configuraciones PHP modificadas:
-1. Las nuevas validaciones son automáticas y no requieren cambios de configuración
-2. El sistema mantendrá compatibilidad con configuraciones existentes como respaldo
-3. Se recomienda probar el envío con imágenes de diferentes tamaños para verificar el funcionamiento
-
-## ✨ Desarrolladores ✨ 
-
-**Javier** - Backend (modelo) | **Michel** - Frontend (vista) | **[entreunosyceros](https://entreunosyceros.net)** - Arquitectura y desarrollo
-
-[Repositorio en GITHUB](https://github.com/sapoclay/felicitaciones-y-notificaciones)
+> **Nota:** Este sistema es funcional y está verificado para uso real. Consulta la documentación incluida para detalles avanzados y resolución de problemas.
